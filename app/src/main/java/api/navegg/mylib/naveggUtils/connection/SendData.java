@@ -1,13 +1,9 @@
 package api.navegg.mylib.naveggUtils.connection;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.provider.Settings;
 import android.util.Base64;
-import android.webkit.WebView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -17,8 +13,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import api.navegg.mylib.BuildConfig;
-import api.navegg.mylib.R;
 import api.navegg.mylib.naveggUtils.base.App;
 import api.navegg.mylib.naveggUtils.base.ServerAPI;
 import api.navegg.mylib.naveggUtils.bean.Package;
@@ -31,11 +25,11 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class Connection {
+public class SendData {
 
     private User user;
     private transient Package.Track track;
-    private transient Package.MobileInfo mMogileInfo;
+    private transient Package.MobileInfo mMobileInfo;
     private int codAccount;
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor editor;
@@ -44,11 +38,10 @@ public class Connection {
     private ServerAPI apiServiceAccount, apiServiceMobile;
     private Gson gson = new Gson();
     private List<String> trackList = new ArrayList<>();
-    private List<Package.MobileInfo> mobileInfoList = new ArrayList<>();
-    private SendDataListTrack sendDataListTrack = new SendDataListTrack();
+    private List<String> mobileInfoList = new ArrayList<>();
 
 
-    public Connection(Context context, int codAccount) {
+    public SendData(Context context, int codAccount) {
 
         this.context = context;
         util = new Util(this.context);
@@ -59,22 +52,20 @@ public class Connection {
 
         this.mSharedPreferences = context.getSharedPreferences("SDK", Context.MODE_PRIVATE);
         editor = mSharedPreferences.edit();
-        Gson gson = new Gson();
-
 
         getListMobileAndTrack();
-
+        Gson gson = new Gson();
         String json = mSharedPreferences.getString("user", "");
         user = gson.fromJson(json, User.class);
     }
 
     private void getListMobileAndTrack() {
 
-        Gson gsonMobile = new Gson();
-        Type typeMobile = new TypeToken<List<Package.MobileInfo>>() {
+/*        Gson gsonMobile = new Gson();
+        Type typeMobile = new TypeToken<List<String>>() {
         }.getType();
         String mMobileInfo = mSharedPreferences.getString("listAppMobileInfo", "");
-        mobileInfoList = gsonMobile.fromJson(mMobileInfo, typeMobile);
+        mobileInfoList = gsonMobile.fromJson(mMobileInfo, typeMobile);*/
 
         Gson gsonTrack = new Gson();
         String json = mSharedPreferences.getString("listAppTrack", "");
@@ -82,6 +73,27 @@ public class Connection {
         }.getType();
         trackList = gsonTrack.fromJson(json, type);
 
+
+    }
+
+
+    public void trackMobile(String mActivity) {
+
+        System.out.println("USER " + user);
+
+        if (user != null) {
+
+            if(!mSharedPreferences.getBoolean("sendDataMobile", true)){
+                sendDataMobile(util.setDataMobile(user));
+            }
+            sendDataTrack(util.setDataTrack(mActivity, user));
+
+
+        } else {
+
+            setListTrackInShared(util.setDataTrack(mActivity, user));
+
+        }
 
     }
 
@@ -105,8 +117,8 @@ public class Connection {
                     editor.putString("user", mUserObject);
                     editor.commit();
 
-                    // mando os dados do mobile uma vez
-                    sendDataMobile(setDataMobile());
+                    sendDataMobile(util.setDataMobile(user));
+
                 }
 
                 @Override
@@ -137,26 +149,34 @@ public class Connection {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
 
-                    System.out.println("Mobile Enviado com sucesso");
+                    editor.putBoolean("sendDataMobile",true);
+                    editor.commit();
+
+    /*                Type type = new TypeToken<ArrayList<String>>() {
+                    }.getType();
+                    mobileInfoList = gson.fromJson(mSharedPreferences.getString("listAppMobileInfo", ""), type);
 
 
-         /*           Type type = new TypeToken<ArrayList<Package.MobileInfo>>() {}.getType();
-                    listMobileInfo = gson.fromJson(mSharedPreferences.getString("listAppMobileInfo", ""), type);
-                    if (listMobileInfo != null) {
-                        System.out.println("Lista de mobile info" + listMobileInfo.size());
-                        for (Package.MobileInfo mobileInfo : listMobileInfo) {
-                            listMobileInfo.remove(track);
-                            System.out.println("Mobile Info NAME " + mobileInfo);
-                            String jsonText = gson.toJson(listMobileInfo);
+                    if (mobileInfoList != null) {
+                        for (String mobileInfo : mobileInfoList) {
+                            mobileInfoList.remove(track);
+                            try {
+                                Package.MobileInfo mobInfo = Package.MobileInfo.parseFrom(Base64.decode(mobileInfo, Base64.NO_WRAP));
 
-                            //limpo shared preferences
-                            editor.remove("listAppMobileInfo");
-                            editor.putString("listAppMobileInfo", jsonText);
-                            editor.commit();
+                                String jsonText = gson.toJson(mobileInfoList);
 
-                            System.out.println("Enviando informações do mobile " + mobileInfo.getAndroidName());
+                                //limpo shared preferences
+                                editor.remove("listAppMobileInfo").commit();
+                                editor.putString("listAppMobileInfo", jsonText);
+                                editor.commit();
 
-                            sendDataMobile(mobileInfo);
+
+                                sendDataMobile(mobInfo);
+                                break;
+
+                            } catch (InvalidProtocolBufferException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }*/
                 }
@@ -170,36 +190,23 @@ public class Connection {
                 }
             });
 
-        } else {
-            setListMobileInfoInShared(setDataMobile());
+        }else{
+
+            editor.putBoolean("sendDataMobile",false);
+            editor.commit();
+
         }
 
     }
 
 
-    public void trackMobile(String mActivity) {
-
-        System.out.println("USER " + user);
-
-        if (user != null) {
-
-            sendDataTrack(setDataTrack(mActivity));
-
-        } else {
-
-            setListTrackInShared(setDataTrack(mActivity));
-
-        }
-
-
-    }
 
 
     // envio os dados do track para o WS
     public void sendDataTrack(Package.Track track) {
 
 
-        if (util.verifyConnection()) {
+        if (util.verifyConnectionWifi()) {
 
             RequestBody body =
                     RequestBody.create(MediaType.parse("text/track"), Base64.encodeToString(track.toByteArray(), Base64.NO_WRAP));
@@ -221,7 +228,6 @@ public class Connection {
                         //sendDataListTrack.doInBackground(trackList);
 
                         for (String objTrack : trackList) {
-
 
 
                             // removo o track da lista
@@ -248,7 +254,6 @@ public class Connection {
                                 e.printStackTrace();
                             }
 
-
                         }
 
                     }
@@ -269,62 +274,9 @@ public class Connection {
     }
 
 
-    public Package.Track setDataTrack(String mActivity) {
 
 
-        track = Package.Track.newBuilder()
-                .setAcc((user != null) ? user.getCodConta() : 100000000)
-                .setUserId((user != null) ? user.getmNvgId() : 100000000)
-                .setNameApp(context.getString(R.string.app_name))
-                .setDeviceIP(util.getMobileIP(context))
-                .setTypeConnection(util.getTypeConnection())
-                .addPageViews(Package.PageView.newBuilder()
-                        .setActivity(mActivity)
-                        .setDateTime(util.getCurrentDateTime())
-                        .setTitlePage(String.valueOf(((Activity) context).getTitle()))
-                        .setCallPage(""))
-                .build();
 
-
-        return track;
-
-    }
-
-
-    public Package.MobileInfo setDataMobile() {
-        Gson gson = new Gson();
-        String json = mSharedPreferences.getString("user", "");
-        user = gson.fromJson(json, User.class);
-
-
-        mMogileInfo = Package.MobileInfo.newBuilder()
-                .setDeviceId(Settings.Secure.getString(context.getContentResolver(),
-                        Settings.Secure.ANDROID_ID))
-                .setPlatform("Android")
-                .setLongitude(util.getLong())
-                .setLatitude(util.getLat())
-                .setAndroidName(Build.DEVICE)
-                .setAndroidBrand(Build.BRAND)
-                .setAndroidModel(Build.MODEL)
-                .setVersionRelease(Build.VERSION.RELEASE)
-                .setManufacturer(Build.MANUFACTURER)
-                .setVersionLib(String.valueOf(BuildConfig.VERSION_CODE))
-                .setVersionCode(BuildConfig.VERSION_CODE)
-                .setVersionOS(Build.VERSION.SDK_INT)
-                .setAndroidFingerPrint(Build.FINGERPRINT)
-                .setUserAgent(new WebView(context).getSettings().getUserAgentString())
-                .setLinkPlayStore(util.getLinkPlayStore())
-                .setTypeCategory(util.getTypeCategory())
-                .setImei(util.getIMEI())
-                .setSoftwareVersion(util.getSoftwareVersion())
-                .setAcc(user.getCodConta())
-                .setUserId(user.getmNvgId())
-                .build();
-
-
-        return mMogileInfo;
-
-    }
 
 
     public void setListTrackInShared(Package.Track trackMobile) {
@@ -344,13 +296,13 @@ public class Connection {
 
     }
 
-    public void setListMobileInfoInShared(Package.MobileInfo mobileInfo) {
+/*    public void setListMobileInfoInShared(Package.MobileInfo mobileInfo) {
 
         if (mobileInfoList == null) {
             mobileInfoList = new ArrayList<>();
         }
 
-        mobileInfoList.add(mobileInfo);
+        mobileInfoList.add(Base64.encodeToString(mobileInfo.toByteArray(), Base64.NO_WRAP));
 
         Gson gson = new Gson();
         String json = gson.toJson(mobileInfoList);
@@ -358,23 +310,7 @@ public class Connection {
         editor.putString("listAppMobileInfo", json);
         editor.commit();
 
-    }
-
-
-    public class SendDataListTrack extends AsyncTask<List<String>, Void, Void> {
-
-        @Override
-        protected Void doInBackground(List<String>... params) {
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-
-            return null;
-        }
-    }
-
+    }*/
 
 }
+

@@ -7,7 +7,7 @@ import com.google.gson.Gson;
 
 import api.navegg.mylib.naveggUtils.base.ServerAPI;
 import api.navegg.mylib.naveggUtils.bean.User;
-import api.navegg.mylib.naveggUtils.connection.Connection;
+import api.navegg.mylib.naveggUtils.connection.SendData;
 
 //import android.support.v7.widget.Toolbar;
 
@@ -21,7 +21,7 @@ public class NaveggAPI {
     private Util util;
     private ServerAPI apiService;
     private String mActivity;
-    private Connection connection;
+    private SendData sendData;
     private User user;
 
     public NaveggAPI(Context ctx, final int codAccount) {
@@ -40,7 +40,7 @@ public class NaveggAPI {
         util.getCallPage();
         util.getVisibleFragment();
 
-        connection = new Connection(context, codAccount);
+        sendData = new SendData(context, codAccount);
 
         this.mSharedPreferences = context.getSharedPreferences("SDK", Context.MODE_PRIVATE);
         user = new User();
@@ -50,7 +50,7 @@ public class NaveggAPI {
 
         System.out.println("USER "+ user);
         if(user == null) {
-            connection.sendFirstData();
+            sendData.sendFirstData();
         }
 
 
@@ -60,7 +60,7 @@ public class NaveggAPI {
 
     public void setTrackPage(String mActivity){
 
-        connection.trackMobile(mActivity);
+        sendData.trackMobile(mActivity);
 
     }
 
