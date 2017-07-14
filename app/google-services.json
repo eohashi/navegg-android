@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "1046750609321",
+    "firebase_url": "https://sdkapp-5f8a4.firebaseio.com",
+    "project_id": "sdkapp-5f8a4",
+    "storage_bucket": "sdkapp-5f8a4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1046750609321:android:56f4610d0e7598f4",
+        "android_client_info": {
+          "package_name": "api.navegg.mylib"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1046750609321-n3pvfj63462ini8q8d6pq1tc7hofq3sf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-AxFFCJC0sat0PVZqxzkzR6OWJpI68XY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
