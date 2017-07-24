@@ -14,8 +14,11 @@ public class App {
 
     private static Retrofit retrofit, retrofitProto = null;
     public static final String ENDPOINT = "http://usr.navdmp.com";
-    //maquina salvador
-    public static final String ENDPOINT2 = "http://192.168.1.113";
+
+    //public static final String ENDPOINT2 = "http://192.168.1.113";
+    public static final String ENDPOINT2 = "http://cdn.navdmp.com";
+
+
 
     public static Retrofit getClient() {
 

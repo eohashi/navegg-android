@@ -14,9 +14,9 @@ public interface ServerAPI {
     @GET("/usr")
     Call<User> getUser(@Query("acc") int acc, @Query("devid") String mDeviceId);
 
-    @POST("/m")
+    @POST("/sdkreq")
     Call<Void> sendDataTrack(@Body  RequestBody mTrack);
 
-    @POST("/minfo")
+    @POST("/sdkinfo")
     Call<Void> sendDataMobile(@Body RequestBody mMobileInfo);
 }

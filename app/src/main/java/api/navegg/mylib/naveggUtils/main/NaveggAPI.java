@@ -22,7 +22,7 @@ public class NaveggAPI {
     private ServerAPI apiService;
     private String mActivity;
     private SendData sendData;
-    private User user;
+    private User user = new User();
 
     public NaveggAPI(Context ctx, final int codAccount) {
         this.context = ctx;
@@ -43,7 +43,7 @@ public class NaveggAPI {
         sendData = new SendData(context, codAccount);
 
         this.mSharedPreferences = context.getSharedPreferences("SDK", Context.MODE_PRIVATE);
-        user = new User();
+
         Gson gson = new Gson();
         String json = mSharedPreferences.getString("user", "");
         user = gson.fromJson(json, User.class);

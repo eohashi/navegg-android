@@ -25,8 +25,12 @@ import com.google.gson.Gson;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.TimeZone;
 
 import api.navegg.mylib.BuildConfig;
 import api.navegg.mylib.R;
@@ -190,7 +194,20 @@ public class Util {
     }
 
     public long getCurrentDateTime() {
-        long millis = System.currentTimeMillis();
+        long millis = 0;
+        //long millis = System.currentTimeMillis();
+        SimpleDateFormat dateFormatGmt = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
+        dateFormatGmt.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+//Local time zone
+        SimpleDateFormat dateFormatLocal = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
+
+        try {
+            millis = dateFormatLocal.parse( dateFormatGmt.format(Calendar.getInstance().getTime().getTime())).getTime();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
         return millis;
 
     }
