@@ -28,8 +28,6 @@ public class NaveggAPI {
         this.context = ctx;
         this.codAccount = codAccount;
 
-        System.out.println("CONSTRUTOR NAVEGGAPI");
-
         setDataDevice();
     }
 
@@ -48,7 +46,6 @@ public class NaveggAPI {
         String json = mSharedPreferences.getString("user", "");
         user = gson.fromJson(json, User.class);
 
-        System.out.println("USER "+ user);
         if(user == null) {
             sendData.sendFirstData();
         }

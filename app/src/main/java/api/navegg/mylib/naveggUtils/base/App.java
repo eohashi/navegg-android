@@ -27,14 +27,12 @@ public class App {
                 .create();
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-// set your desired log level
+
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-// add your other interceptors …
 
-// add logging as last interceptor
-        httpClient.addInterceptor(logging);  // <-- this is the important line!
+        httpClient.addInterceptor(logging);
 
         retrofit = new Retrofit.Builder()
                 .baseUrl(ENDPOINT)

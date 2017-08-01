@@ -17,7 +17,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.text.format.Formatter;
-import android.util.Log;
 import android.webkit.WebView;
 
 import com.google.gson.Gson;
@@ -231,13 +230,9 @@ public class Util {
 
         }
 
-        Log.d("topActivity", "CURRENT Activity ::"
-                + taskInfo.get(0).topActivity.getClassName());
-
         String activityName = taskInfo.get(0).topActivity.getClassName();
 
         if (!lastActivityName.equalsIgnoreCase(activityName)) {
-            System.out.println("LASTPACKAGENAME " + lastActivityName);
             return lastActivityName;
         }
 
@@ -282,7 +277,6 @@ public class Util {
             connected = false;
         }
 
-        System.out.println("TYPE SendData " + connected);
 
         return connected;
     }
@@ -305,7 +299,6 @@ public class Util {
             connected = false;
         }
 
-        System.out.println("TYPE SendData " + connected);
 
         return connected;
     }

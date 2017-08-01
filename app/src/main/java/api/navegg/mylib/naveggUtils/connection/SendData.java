@@ -79,8 +79,6 @@ public class SendData {
 
     public void trackMobile(String mActivity) {
 
-        System.out.println("USER " + user);
-
         if (user != null) {
 
             if(!mSharedPreferences.getBoolean("sendDataMobile", true)){
@@ -152,33 +150,6 @@ public class SendData {
                     editor.putBoolean("sendDataMobile",true);
                     editor.commit();
 
-    /*                Type type = new TypeToken<ArrayList<String>>() {
-                    }.getType();
-                    mobileInfoList = gson.fromJson(mSharedPreferences.getString("listAppMobileInfo", ""), type);
-
-
-                    if (mobileInfoList != null) {
-                        for (String mobileInfo : mobileInfoList) {
-                            mobileInfoList.remove(track);
-                            try {
-                                Package.MobileInfo mobInfo = Package.MobileInfo.parseFrom(Base64.decode(mobileInfo, Base64.NO_WRAP));
-
-                                String jsonText = gson.toJson(mobileInfoList);
-
-                                //limpo shared preferences
-                                editor.remove("listAppMobileInfo").commit();
-                                editor.putString("listAppMobileInfo", jsonText);
-                                editor.commit();
-
-
-                                sendDataMobile(mobInfo);
-                                break;
-
-                            } catch (InvalidProtocolBufferException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }*/
                 }
 
                 @Override
