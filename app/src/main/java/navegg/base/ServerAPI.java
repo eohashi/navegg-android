@@ -1,6 +1,6 @@
-package api.navegg.mylib.naveggUtils.base;
+package navegg.base;
 
-import api.navegg.mylib.naveggUtils.bean.User;
+import navegg.bean.User;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;

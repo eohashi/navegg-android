@@ -1,4 +1,4 @@
-package api.navegg.mylib.naveggUtils.main;
+package navegg.main;
 
 import android.content.Context;
 import android.content.pm.PackageManager;

@@ -1,13 +1,13 @@
-package api.navegg.mylib.naveggUtils.main;
+package navegg.main;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
 
-import api.navegg.mylib.naveggUtils.base.ServerAPI;
-import api.navegg.mylib.naveggUtils.bean.User;
-import api.navegg.mylib.naveggUtils.connection.SendData;
+import navegg.base.ServerAPI;
+import navegg.bean.User;
+import navegg.connection.SendData;
 
 //import android.support.v7.widget.Toolbar;
 

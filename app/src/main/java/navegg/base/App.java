@@ -1,4 +1,4 @@
-package api.navegg.mylib.naveggUtils.base;
+package navegg.base;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

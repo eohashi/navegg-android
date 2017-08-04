@@ -1,4 +1,4 @@
-package api.navegg.mylib.naveggUtils.main;
+package navegg.main;
 
 import android.Manifest;
 import android.app.Activity;
@@ -12,6 +12,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.provider.Settings;
+import android.support.v4.BuildConfig;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
@@ -24,17 +25,16 @@ import com.google.gson.Gson;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.TimeZone;
 
-import api.navegg.mylib.BuildConfig;
-import api.navegg.mylib.R;
-import api.navegg.mylib.naveggUtils.bean.Package;
-import api.navegg.mylib.naveggUtils.bean.User;
+import navegg.R;
+import navegg.bean.MobileInfo;
+import navegg.bean.Package;
+import navegg.bean.PageView;
+import navegg.bean.Track;
+import navegg.bean.User;
 
 import static android.content.Context.ACTIVITY_SERVICE;
 import static android.content.Context.CONNECTIVITY_SERVICE;
@@ -52,6 +52,8 @@ public class Util {
     String lastActivityName = null;
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor editor;
+    List<Package.PageView> listPackagePageView = new ArrayList<>();
+
 
     public Util(Context context) {
         this.context = context;
@@ -193,20 +195,7 @@ public class Util {
     }
 
     public long getCurrentDateTime() {
-        long millis = 0;
-        //long millis = System.currentTimeMillis();
-        SimpleDateFormat dateFormatGmt = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
-        dateFormatGmt.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-//Local time zone
-        SimpleDateFormat dateFormatLocal = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss");
-
-        try {
-            millis = dateFormatLocal.parse( dateFormatGmt.format(Calendar.getInstance().getTime().getTime())).getTime();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
+        long millis = System.currentTimeMillis();
         return millis;
 
     }
@@ -299,67 +288,140 @@ public class Util {
             connected = false;
         }
 
-
         return connected;
     }
 
 
-    public Package.MobileInfo setDataMobile(User user) {
-        Gson gson = new Gson();
-        String json = mSharedPreferences.getString("user", "");
-        user = gson.fromJson(json, User.class);
+    public Package.MobileInfo setDataMobile(MobileInfo mobileInfo) {
 
 
         Package.MobileInfo mMobileInfo = Package.MobileInfo.newBuilder()
-                .setDeviceId(Settings.Secure.getString(context.getContentResolver(),
-                        Settings.Secure.ANDROID_ID))
-                .setPlatform("Android")
-                .setLongitude(getLong())
-                .setLatitude(getLat())
-                .setAndroidName(Build.DEVICE)
-                .setAndroidBrand(Build.BRAND)
-                .setAndroidModel(Build.MODEL)
-                .setVersionRelease(Build.VERSION.RELEASE)
-                .setManufacturer(Build.MANUFACTURER)
-                .setVersionLib(String.valueOf(BuildConfig.VERSION_CODE))
-                .setVersionCode(BuildConfig.VERSION_CODE)
-                .setVersionOS(Build.VERSION.SDK_INT)
-                .setAndroidFingerPrint(Build.FINGERPRINT)
-                .setUserAgent(new WebView(context).getSettings().getUserAgentString())
-                .setLinkPlayStore(getLinkPlayStore())
-                .setTypeCategory(getTypeCategory())
-                .setImei(getIMEI())
-                .setSoftwareVersion(getSoftwareVersion())
-                .setAcc(user.getCodConta())
-                .setUserId(user.getmNvgId())
+                .setDeviceId(mobileInfo.getDeviceId())
+                .setPlatform(mobileInfo.getPlatform())
+                .setLongitude(mobileInfo.getLongitude())
+                .setLatitude(mobileInfo.getLatitude())
+                .setAndroidName(mobileInfo.getAndroidName())
+                .setAndroidBrand(mobileInfo.getAndroidBrand())
+                .setAndroidModel(mobileInfo.getAndroidModel())
+                .setVersionRelease(mobileInfo.getVersionRelease())
+                .setManufacturer(mobileInfo.getManufacturer())
+                .setVersionLib(mobileInfo.getVersionLib())
+                .setVersionCode(mobileInfo.getVersionCode())
+                .setVersionOS(mobileInfo.getVersionOS())
+                .setAndroidFingerPrint(mobileInfo.getAndroidFingerPrint())
+                .setUserAgent(mobileInfo.getUserAgent())
+                .setLinkPlayStore(mobileInfo.getLinkPlayStore())
+                .setTypeCategory(mobileInfo.getTypeCategory())
+                .setImei(mobileInfo.getImei())
+                .setSoftwareVersion(mobileInfo.getSoftwareVersion())
+                .setAcc(mobileInfo.getAcc())
+                .setUserId(mobileInfo.getUserId())
                 .build();
-
 
         return mMobileInfo;
 
     }
 
+    public MobileInfo setDataMobileInfo(User user){
+        Gson gson = new Gson();
+        String json = mSharedPreferences.getString("user", "");
+        user = gson.fromJson(json, User.class);
 
-    public Package.Track setDataTrack(String mActivity, User user) {
+        MobileInfo mobileInfo =
+                new MobileInfo();
+        mobileInfo.setDeviceId(Settings.Secure.getString(context.getContentResolver(),
+                Settings.Secure.ANDROID_ID));
+        mobileInfo.setPlatform("Android");
+        mobileInfo.setLongitude(getLong());
+        mobileInfo.setLatitude(getLat());
+        mobileInfo.setAndroidName(Build.DEVICE);
+        mobileInfo.setAndroidBrand(Build.BRAND);
+        mobileInfo.setAndroidModel(Build.MODEL);
+        mobileInfo.setVersionRelease(Build.VERSION.RELEASE);
+        mobileInfo.setManufacturer(Build.MANUFACTURER);
+        mobileInfo.setVersionLib(BuildConfig.VERSION_NAME);
+        mobileInfo.setVersionCode(BuildConfig.VERSION_CODE);
+        mobileInfo.setVersionOS(Build.VERSION.SDK_INT);
+        mobileInfo.setAndroidFingerPrint(Build.FINGERPRINT);
+        mobileInfo.setUserAgent(new WebView(context).getSettings().getUserAgentString());
+        mobileInfo.setLinkPlayStore(getLinkPlayStore());
+        mobileInfo.setTypeCategory(getTypeCategory());
+        mobileInfo.setImei(getIMEI());
+        mobileInfo.setSoftwareVersion(getSoftwareVersion());
+        mobileInfo.setAcc(user.getCodConta());
+        mobileInfo.setUserId(user.getmNvgId());
 
 
-        Package.Track track = Package.Track.newBuilder()
-                .setAcc((user != null) ? user.getCodConta() : 100000000)
-                .setUserId((user != null) ? user.getmNvgId() : 100000000)
-                .setNameApp(context.getString(R.string.app_name))
-                .setDeviceIP(getMobileIP(context))
-                .setTypeConnection(getTypeConnection())
-                .addPageViews(Package.PageView.newBuilder()
-                        .setActivity(mActivity)
-                        .setDateTime(getCurrentDateTime())
-                        .setTitlePage(String.valueOf(((Activity) context).getTitle()))
-                        .setCallPage(""))
+        return mobileInfo;
+    }
+
+
+    public Package.Track setDataTrack(Track track, List<Package.PageView> listPageView) {
+
+
+        Package.Track packageTrack = Package.Track.newBuilder()
+                .setAcc(track.getAcc())
+                .setUserId(track.getUserId())
+                .setNameApp(track.getNameApp())
+                .setDeviceIP(track.getDeviceIP())
+                .setTypeConnection(track.getTypeConnection())
+                .addAllPageViews(listPageView)
                 .build();
 
 
-        return track;
+        return packageTrack;
 
     }
+
+
+
+
+    public Track setDataBeanTrack(User user, List<PageView> pageView){
+
+          Track track = new Track();
+        track.setAcc((user != null) ? user.getCodConta() : 100000000);
+        track.setUserId((user != null) ? user.getmNvgId() : 100000000);
+        track.setNameApp(context.getString(R.string.app_name));
+        track.setDeviceIP(getMobileIP(context));
+        track.setTypeConnection(getTypeConnection());
+        track.setPageViews(pageView);
+
+        return track;
+    }
+
+
+    public List<Package.PageView> setListDataPageView(List<PageView> pageView) {
+
+
+        for(PageView pageViews : pageView) {
+
+            Package.PageView packagePageView = Package.PageView.newBuilder()
+                    .setActivity(pageViews.getActivity())
+                    .setDateTime(pageViews.getDateTime())
+                    .setTitlePage(pageViews.getTitlePage())
+                    .setCallPage("").build();
+
+            listPackagePageView.add(packagePageView);
+        }
+
+        return listPackagePageView;
+
+    }
+
+
+    public PageView setDataPageView(String mActivity){
+
+        PageView pageView = new PageView();
+        pageView.setActivity(mActivity);
+        pageView.setDateTime(getCurrentDateTime());
+        pageView.setTitlePage(String.valueOf(((Activity) context).getTitle()));
+        pageView.setCallPage("");
+
+        return pageView;
+    }
+
+
+
 
 
 

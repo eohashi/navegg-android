@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:1046750609321:android:56f4610d0e7598f4",
         "android_client_info": {
-          "package_name": "api.navegg.mylib"
+          "package_name": "navegg"
         }
       },
       "oauth_client": [

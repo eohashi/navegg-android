@@ -19,7 +19,7 @@ android {
     }
 }
 
-uploadArchives {
+/*uploadArchives {
     repositories {
         mavenDeployer {
             //repository(url: "file:///C:/gradle/rep/")
@@ -31,7 +31,8 @@ uploadArchives {
         }
     }
 }
-task install(dependsOn: uploadArchives)
+
+task install(dependsOn: uploadArchives)*/
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -52,4 +53,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
-apply plugin: 'com.google.gms.google-services'
+apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
+
+task install(dependsOn: uploadArchives)

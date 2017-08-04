@@ -1,4 +1,4 @@
-package api.navegg.mylib.naveggUtils.bean;
+package navegg.bean;
 
 import com.google.gson.annotations.SerializedName;
 
