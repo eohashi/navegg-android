@@ -19,4 +19,7 @@ public interface ServerAPI {
 
     @POST("/sdkinfo")
     Call<Void> sendDataMobile(@Body RequestBody mMobileInfo);
+
+    @POST("/usr")
+    Call<Void> sendCustomId(@Query("acc") int acc, @Query("cus") int id_custom, @Query("id") long id_user);
 }

@@ -37,6 +37,7 @@ public class SendData {
     private Util util;
     private ServerAPI apiServiceAccount, apiServiceMobile;
     private List<PageView> trackPageViewList = new ArrayList<>();
+    private List<Integer> customList = new ArrayList<>();
 
 
     public SendData(Context context, int codAccount) {
@@ -52,6 +53,7 @@ public class SendData {
         editor = mSharedPreferences.edit();
 
         getListMobileAndTrack();
+        getListIdCustom();
         Gson gson = new Gson();
         String json = mSharedPreferences.getString("user", "");
         user = gson.fromJson(json, User.class);
@@ -70,6 +72,23 @@ public class SendData {
         Type type = new TypeToken<List<PageView>>() {
         }.getType();
         trackPageViewList = gsonTrack.fromJson(json, type);
+
+
+    }
+
+    private void getListIdCustom() {
+
+/*        Gson gsonMobile = new Gson();
+        Type typeMobile = new TypeToken<List<String>>() {
+        }.getType();
+        String mMobileInfo = mSharedPreferences.getString("listAppMobileInfo", "");
+        mobileInfoList = gsonMobile.fromJson(mMobileInfo, typeMobile);*/
+
+        Gson gsonTrack = new Gson();
+        String json = mSharedPreferences.getString("customList", "");
+        Type type = new TypeToken<List<Integer>>() {
+        }.getType();
+        customList = gsonTrack.fromJson(json, type);
 
 
     }
@@ -103,6 +122,32 @@ public class SendData {
 
         } else {
             setListTrackInShared(util.setDataPageView(mActivity));
+        }
+
+    }
+
+
+    public void setCustomInMobile(int id_custom) {
+
+
+        if (user != null) {
+
+            if (!mSharedPreferences.getBoolean("sendDataMobile", true)) {
+                sendDataMobile(util.setDataMobile(util.setDataMobileInfo(user)));
+            }
+
+            // insiro na lista de custom o id_custom
+            // se caso falhe a conexão na hora de enviar os dados.
+            setInListCustom(id_custom);
+            getListIdCustom();
+
+
+            if (customList != null) {
+                sendIdCustom(customList, id_custom);
+            }
+
+        } else {
+            setInListCustom(id_custom);
         }
 
     }
@@ -216,6 +261,43 @@ public class SendData {
     }
 
 
+    // envio os dados do track para o WS
+    private void sendIdCustom(final List<Integer> listCustom, final int id_custom) {
+        System.out.println("LIST CUSTOM "+ listCustom);
+        System.out.println("Id CUSTOM "+ id_custom);
+        if (util.verifyConnectionWifi()) {
+            Call<Void> call1 = null;
+
+            call1 = apiServiceAccount.sendCustomId(user.getCodConta(),id_custom, user.getmNvgId());
+
+            call1.enqueue(new Callback<Void>() {
+
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+
+                    for(int i = 0; i < listCustom.size(); i++){
+                        System.out.println("ID CUSTOM "+ listCustom.get(i));
+                        if(listCustom.get(i).equals(id_custom)){
+                                listCustom.remove(i);
+                        }else {
+                                sendIdCustom(listCustom, listCustom.get(i));
+                                System.out.println("RESPONSE " + response);
+                        }
+                     }
+                }
+
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    t.printStackTrace();
+                    call.cancel();
+                }
+            });
+
+        }
+
+    }
+
+
     public void setListTrackInShared(PageView pageViewData) {
 
         if (trackPageViewList == null) {
@@ -228,6 +310,22 @@ public class SendData {
         String json = gson.toJson(trackPageViewList);
         editor.remove("listAppPageView").commit();
         editor.putString("listAppPageView", json);
+        editor.commit();
+
+    }
+
+    public void setInListCustom(int id_custom) {
+
+        if (customList == null) {
+            customList = new ArrayList<>();
+        }
+
+        customList.add(id_custom);
+
+        Gson gson = new Gson();
+        String json = gson.toJson(customList);
+        editor.remove("customList").commit();
+        editor.putString("customList", json);
         editor.commit();
 
     }

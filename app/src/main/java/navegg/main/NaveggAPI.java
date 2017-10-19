@@ -62,6 +62,13 @@ public class NaveggAPI {
     }
 
 
+    public void setCustom(int id_custom){
+
+        sendData.setCustomInMobile(id_custom);
+
+    }
+
+
 
 
 

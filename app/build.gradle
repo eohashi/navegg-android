@@ -19,7 +19,7 @@ android {
     }
 }
 
-/*uploadArchives {
+uploadArchives {
     repositories {
         mavenDeployer {
             //repository(url: "file:///C:/gradle/rep/")
@@ -32,7 +32,7 @@ android {
     }
 }
 
-task install(dependsOn: uploadArchives)*/
+task install(dependsOn: uploadArchives)
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -41,7 +41,6 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-
 
     compile 'com.squareup.retrofit2:converter-gson:2.3.0'
 
@@ -53,6 +52,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
-apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
+/*apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
 
-task install(dependsOn: uploadArchives)
+task install(dependsOn: uploadArchives)*/

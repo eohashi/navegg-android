@@ -1,6 +1,7 @@
 package navegg.main;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
@@ -59,6 +60,11 @@ public class Util {
         this.context = context;
         util = new LocationPosition(context);
 
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            List<ActivityManager.AppTask> taskInfo = null;
+        }else{
+            List<ActivityManager.RunningTaskInfo> taskInfo = null;
+        }
         this.mSharedPreferences = context.getSharedPreferences("SDK", Context.MODE_PRIVATE);
         editor = mSharedPreferences.edit();
 
@@ -177,20 +183,20 @@ public class Util {
 
     public String getSoftwareVersion() {
 
+
         if (ContextCompat.checkSelfPermission(context,
                 Manifest.permission.READ_PHONE_STATE)
-                != PackageManager.PERMISSION_GRANTED) {
-
+                == PackageManager.PERMISSION_DENIED) {
 
             return "Software Sem permissão";
-
 
         } else {
             TelephonyManager mTelephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
             String mSoftwareVersion = mTelephonyManager.getDeviceSoftwareVersion();
-
+            if(mSoftwareVersion == null ){
+                mSoftwareVersion = "";
+            }
             return mSoftwareVersion;
-
         }
     }
 
@@ -203,29 +209,55 @@ public class Util {
 
     /* Pega pagina origem que chamou pagina atual
     * (Somente para activity)*/
+    @TargetApi(Build.VERSION_CODES.M)
     public String getCallPage() {
 
         lastActivityName = mSharedPreferences.getString("lastActivityName", "");
         ActivityManager am = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
+        String activityName = "";
 
-        List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(2);
+        List<ActivityManager.AppTask> tasks = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            tasks = am.getAppTasks();
 
-        if (lastActivityName == "") {
 
-            editor.putString("lastActivityName", taskInfo.get(0).topActivity.getClassName());
-            editor.commit();
 
-            lastActivityName = taskInfo.get(0).topActivity.getClassName();
+            for (ActivityManager.AppTask task : tasks) {
+                if (lastActivityName == "") {
+
+                    editor.putString("lastActivityName", task.getTaskInfo().topActivity.getClassName().toString());
+                    editor.commit();
+
+                    lastActivityName = task.getTaskInfo().topActivity.getClassName().toString();;
+
+                }
+                activityName = task.getTaskInfo().topActivity.getClassName().toString();
+            }
+        }else {
+
+            List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(2);
+            if (lastActivityName == "") {
+
+                editor.putString("lastActivityName", taskInfo.get(0).topActivity.getClassName());
+                editor.commit();
+
+                lastActivityName = taskInfo.get(0).topActivity.getClassName();
+
+            }
+
+            activityName = taskInfo.get(0).topActivity.getClassName();
+
 
         }
 
-        String activityName = taskInfo.get(0).topActivity.getClassName();
+
 
         if (!lastActivityName.equalsIgnoreCase(activityName)) {
             return lastActivityName;
         }
 
         lastActivityName = activityName;
+
 
         return "";
     }
@@ -279,7 +311,8 @@ public class Util {
          /*   if (conectivtyManager.getActiveNetworkInfo() != null
                     && conectivtyManager.getActiveNetworkInfo().isAvailable()
                     && conectivtyManager.getActiveNetworkInfo().isConnected())*/
-            if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI || activeNetwork.getType() == ConnectivityManager.TYPE_ETHERNET) {
+            System.out.println("CONNECTION "+activeNetwork.getType());
+            if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE || activeNetwork.getType() == ConnectivityManager.TYPE_ETHERNET) {
                 connected = true;
             } else {
                 connected = false;
@@ -378,7 +411,7 @@ public class Util {
 
     public Track setDataBeanTrack(User user, List<PageView> pageView){
 
-          Track track = new Track();
+        Track track = new Track();
         track.setAcc((user != null) ? user.getCodConta() : 100000000);
         track.setUserId((user != null) ? user.getmNvgId() : 100000000);
         track.setNameApp(context.getString(R.string.app_name));
