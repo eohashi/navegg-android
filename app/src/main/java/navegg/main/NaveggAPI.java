@@ -21,17 +21,25 @@ public class NaveggAPI {
     private Util util;
     private ServerAPI apiService;
     private String mActivity;
-    private SendData sendData;
+    protected SendData sendData;
     private User user = new User();
+
+    public NaveggAPI getInstanceNaveggAPI(){
+        return new NaveggAPI(context,user.getCodConta());
+    }
 
     public NaveggAPI(Context ctx, final int codAccount) {
         this.context = ctx;
         this.codAccount = codAccount;
 
         setDataDevice();
+
+/*        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        context.registerReceiver(new VerifyStateConnection(), intentFilter);*/
     }
 
-    private void setDataDevice() {
+    public void setDataDevice() {
 
         util = new Util(context);
 
@@ -67,9 +75,6 @@ public class NaveggAPI {
         sendData.setCustomInMobile(id_custom);
 
     }
-
-
-
 
 
 

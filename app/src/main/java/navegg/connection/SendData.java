@@ -29,16 +29,19 @@ import retrofit2.Response;
 
 public class SendData {
 
-    private User user;
+    public User user;
     private int codAccount;
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor editor;
     private Context context;
     private Util util;
     private ServerAPI apiServiceAccount, apiServiceMobile;
-    private List<PageView> trackPageViewList = new ArrayList<>();
-    private List<Integer> customList = new ArrayList<>();
+    public List<PageView> trackPageViewList = new ArrayList<>();
+    public List<Integer> customList = new ArrayList<>();
 
+    public SendData getInstance() {
+        return new SendData(context,user.getCodConta());
+    }
 
     public SendData(Context context, int codAccount) {
 
@@ -54,12 +57,14 @@ public class SendData {
 
         getListMobileAndTrack();
         getListIdCustom();
+
         Gson gson = new Gson();
         String json = mSharedPreferences.getString("user", "");
         user = gson.fromJson(json, User.class);
+
     }
 
-    private void getListMobileAndTrack() {
+    public void getListMobileAndTrack() {
 
 
         Gson gsonTrack = new Gson();
@@ -71,7 +76,7 @@ public class SendData {
 
     }
 
-    private void getListIdCustom() {
+    public void getListIdCustom() {
 
         Gson gsonTrack = new Gson();
         String json = mSharedPreferences.getString("customList", "");
@@ -214,7 +219,7 @@ public class SendData {
 
 
     // envio os dados do track para o WS
-    private void sendDataTrack(List<PageView> pageView) {
+    public void sendDataTrack(List<PageView> pageView) {
 
         Package.Track trackMob = null;
         trackMob = util.setDataTrack(util.setDataBeanTrack(user, pageView), util.setListDataPageView(pageView));
@@ -251,7 +256,7 @@ public class SendData {
 
 
     // envio os dados do track para o WS
-    private void sendIdCustom(final List<Integer> listCustom, final int id_custom) {
+    public void sendIdCustom(final List<Integer> listCustom, final int id_custom) {
         System.out.println("List Custom " + listCustom);
         if (util.verifyConnectionWifi()) {
             Call<Void> call1 = null;

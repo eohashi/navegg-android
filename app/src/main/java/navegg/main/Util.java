@@ -72,7 +72,7 @@ public class Util {
 
 
     public static String getMobileIP(Context context) {
-        String ipAddress = null;
+        String ipAddress = "No Connection";
 
         if (isConnectedMobile(context)) {
             try {
@@ -133,12 +133,15 @@ public class Util {
     public String getTypeConnection() {
         ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = connManager.getActiveNetworkInfo();
-
-        if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
-            return "WIFI";
-        } else if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) {
-            return "LTE";
-        } else return "Not SendData";
+        try {
+            if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
+                return "WIFI";
+            } else if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) {
+                return "LTE";
+            } else return "No Connection";
+        }catch (Exception e){
+            return "No Connection";
+        }
     }
 
     public String getTypeCategory() {
