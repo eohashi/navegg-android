@@ -311,7 +311,6 @@ public class Util {
          /*   if (conectivtyManager.getActiveNetworkInfo() != null
                     && conectivtyManager.getActiveNetworkInfo().isAvailable()
                     && conectivtyManager.getActiveNetworkInfo().isConnected())*/
-            System.out.println("CONNECTION "+activeNetwork.getType());
             if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE || activeNetwork.getType() == ConnectivityManager.TYPE_ETHERNET) {
                 connected = true;
             } else {

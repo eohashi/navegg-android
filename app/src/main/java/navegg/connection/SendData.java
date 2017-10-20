@@ -263,8 +263,7 @@ public class SendData {
 
     // envio os dados do track para o WS
     private void sendIdCustom(final List<Integer> listCustom, final int id_custom) {
-        System.out.println("LIST CUSTOM "+ listCustom);
-        System.out.println("Id CUSTOM "+ id_custom);
+        System.out.println("List Custom " + listCustom);
         if (util.verifyConnectionWifi()) {
             Call<Void> call1 = null;
 
@@ -274,16 +273,15 @@ public class SendData {
 
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
-
-                    for(int i = 0; i < listCustom.size(); i++){
-                        System.out.println("ID CUSTOM "+ listCustom.get(i));
-                        if(listCustom.get(i).equals(id_custom)){
-                                listCustom.remove(i);
-                        }else {
-                                sendIdCustom(listCustom, listCustom.get(i));
-                                System.out.println("RESPONSE " + response);
-                        }
-                     }
+                    listCustom.remove(new Integer(id_custom));
+                    if(listCustom.size() > 0) {
+                        for(int id : listCustom){
+                            sendIdCustom(listCustom, id);
+                            break;
+                         }
+                    }else{
+                        editor.remove("customList").commit();
+                    }
                 }
 
                 @Override
@@ -329,22 +327,6 @@ public class SendData {
         editor.commit();
 
     }
-
-/*    public void setListMobileInfoInShared(Package.MobileInfo mobileInfo) {
-
-        if (mobileInfoList == null) {
-            mobileInfoList = new ArrayList<>();
-        }
-
-        mobileInfoList.add(Base64.encodeToString(mobileInfo.toByteArray(), Base64.NO_WRAP));
-
-        Gson gson = new Gson();
-        String json = gson.toJson(mobileInfoList);
-        editor.remove("listAppMobileInfo").commit();
-        editor.putString("listAppMobileInfo", json);
-        editor.commit();
-
-    }*/
 
 }
 
