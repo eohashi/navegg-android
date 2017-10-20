@@ -12,7 +12,7 @@ import retrofit2.converter.protobuf.ProtoConverterFactory;
 
 public class App {
 
-    private static Retrofit retrofit, retrofitProto = null;
+    private static Retrofit retrofit, retrofitProto, retrofitCustom= null;
     public static final String ENDPOINT = "http://usr.navdmp.com";
 
     //public static final String ENDPOINT2 = "http://192.168.1.113";
@@ -68,6 +68,8 @@ public class App {
 
         return retrofitProto;
     }
+
+
 
 
 }

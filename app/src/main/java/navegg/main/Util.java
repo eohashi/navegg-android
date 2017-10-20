@@ -311,7 +311,7 @@ public class Util {
          /*   if (conectivtyManager.getActiveNetworkInfo() != null
                     && conectivtyManager.getActiveNetworkInfo().isAvailable()
                     && conectivtyManager.getActiveNetworkInfo().isConnected())*/
-            if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE || activeNetwork.getType() == ConnectivityManager.TYPE_ETHERNET) {
+            if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE || activeNetwork.getType() == ConnectivityManager.TYPE_ETHERNET || activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
                 connected = true;
             } else {
                 connected = false;

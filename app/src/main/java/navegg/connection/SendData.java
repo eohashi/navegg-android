@@ -61,11 +61,6 @@ public class SendData {
 
     private void getListMobileAndTrack() {
 
-/*        Gson gsonMobile = new Gson();
-        Type typeMobile = new TypeToken<List<String>>() {
-        }.getType();
-        String mMobileInfo = mSharedPreferences.getString("listAppMobileInfo", "");
-        mobileInfoList = gsonMobile.fromJson(mMobileInfo, typeMobile);*/
 
         Gson gsonTrack = new Gson();
         String json = mSharedPreferences.getString("listAppPageView", "");
@@ -77,12 +72,6 @@ public class SendData {
     }
 
     private void getListIdCustom() {
-
-/*        Gson gsonMobile = new Gson();
-        Type typeMobile = new TypeToken<List<String>>() {
-        }.getType();
-        String mMobileInfo = mSharedPreferences.getString("listAppMobileInfo", "");
-        mobileInfoList = gsonMobile.fromJson(mMobileInfo, typeMobile);*/
 
         Gson gsonTrack = new Gson();
         String json = mSharedPreferences.getString("customList", "");
@@ -267,7 +256,7 @@ public class SendData {
         if (util.verifyConnectionWifi()) {
             Call<Void> call1 = null;
 
-            call1 = apiServiceAccount.sendCustomId(user.getCodConta(),id_custom, user.getmNvgId());
+            call1 = apiServiceMobile.sendCustomId(user.getCodConta(),id_custom, user.getmNvgId());
 
             call1.enqueue(new Callback<Void>() {
 
