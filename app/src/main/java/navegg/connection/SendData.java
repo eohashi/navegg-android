@@ -289,6 +289,40 @@ public class SendData {
 
     }
 
+    // envio os dados do track para o WS
+    public void getSegments(final List<Integer> listCustom, final int id_custom) {
+        System.out.println("List Custom " + listCustom);
+        if (util.verifyConnectionWifi()) {
+            Call<Void> call1 = null;
+
+            call1 = apiServiceMobile.sendCustomId(user.getCodConta(),id_custom, user.getmNvgId());
+
+            call1.enqueue(new Callback<Void>() {
+
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    listCustom.remove(new Integer(id_custom));
+                    if(listCustom.size() > 0) {
+                        for(int id : listCustom){
+                            sendIdCustom(listCustom, id);
+                            break;
+                        }
+                    }else{
+                        editor.remove("customList").commit();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    t.printStackTrace();
+                    call.cancel();
+                }
+            });
+
+        }
+
+    }
+
 
     public void setListTrackInShared(PageView pageViewData) {
 

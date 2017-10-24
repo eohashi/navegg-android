@@ -1,12 +1,15 @@
 package navegg.main;
 
 import android.content.Context;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 
 import com.google.gson.Gson;
 
 import navegg.base.ServerAPI;
 import navegg.bean.User;
+import navegg.broadcast.VerifyStateConnection;
 import navegg.connection.SendData;
 
 //import android.support.v7.widget.Toolbar;
@@ -34,9 +37,14 @@ public class NaveggAPI {
 
         setDataDevice();
 
-/*        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        context.registerReceiver(new VerifyStateConnection(), intentFilter);*/
+        this.mSharedPreferences = context.getSharedPreferences("SDK", Context.MODE_PRIVATE);
+        boolean broadCast = mSharedPreferences.getBoolean("broadCastRunning", false);
+
+        if(!broadCast) {
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+            context.registerReceiver(new VerifyStateConnection(), intentFilter);
+        }
     }
 
     public void setDataDevice() {
