@@ -2,6 +2,7 @@ package navegg.base;
 
 import navegg.bean.User;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -22,4 +23,7 @@ public interface ServerAPI {
 
     @POST("/cus")
     Call<Void> sendCustomId(@Query("acc") int acc, @Query("cus") int id_custom, @Query("id") long id_user);
+
+    @GET("/usr")
+    Call<ResponseBody> getSegments(@Query("acc") int acc, @Query("wst") int wst, @Query("v") int v, @Query("id") long id_user, @Query("asdk") String version_sdk);
 }

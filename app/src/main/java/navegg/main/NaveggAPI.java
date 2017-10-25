@@ -4,10 +4,10 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
+import android.os.Handler;
 
 import com.google.gson.Gson;
 
-import navegg.base.ServerAPI;
 import navegg.bean.User;
 import navegg.broadcast.VerifyStateConnection;
 import navegg.connection.SendData;
@@ -18,25 +18,17 @@ import navegg.connection.SendData;
 public class NaveggAPI {
 
     private Context context;
-    private int codAccount;
     private SharedPreferences mSharedPreferences;
-    private SharedPreferences.Editor editor;
     private Util util;
-    private ServerAPI apiService;
-    private String mActivity;
     protected SendData sendData;
     private User user = new User();
-
-    public NaveggAPI getInstanceNaveggAPI(){
-        return new NaveggAPI(context,user.getCodConta());
-    }
+    private Handler handler;
 
     public NaveggAPI(Context ctx, final int codAccount) {
         this.context = ctx;
-        this.codAccount = codAccount;
-
+        sendData = new SendData(ctx, codAccount);
+        handler = new Handler();
         setDataDevice();
-
         this.mSharedPreferences = context.getSharedPreferences("SDK", Context.MODE_PRIVATE);
         boolean broadCast = mSharedPreferences.getBoolean("broadCastRunning", false);
 
@@ -54,8 +46,6 @@ public class NaveggAPI {
         util.getCallPage();
         util.getVisibleFragment();
 
-        sendData = new SendData(context, codAccount);
-
         this.mSharedPreferences = context.getSharedPreferences("SDK", Context.MODE_PRIVATE);
 
         Gson gson = new Gson();
@@ -65,24 +55,24 @@ public class NaveggAPI {
         if(user == null) {
             sendData.sendFirstData();
         }
-
-
     }
 
 
 
     public void setTrackPage(String mActivity){
-
         sendData.trackMobile(mActivity);
-
     }
 
 
     public void setCustom(int id_custom){
-
         sendData.setCustomInMobile(id_custom);
-
     }
+
+    public String getSegments(final String segment){
+        String seg = util.getSegments(segment);
+        return seg;
+    }
+
 
 
 

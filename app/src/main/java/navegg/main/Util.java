@@ -13,7 +13,6 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.provider.Settings;
-import android.support.v4.BuildConfig;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
@@ -23,6 +22,9 @@ import android.webkit.WebView;
 
 import com.google.gson.Gson;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -30,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+import navegg.BuildConfig;
 import navegg.R;
 import navegg.bean.MobileInfo;
 import navegg.bean.Package;
@@ -54,12 +57,11 @@ public class Util {
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor editor;
     List<Package.PageView> listPackagePageView = new ArrayList<>();
-
+    String[] listSegments = {"gender", "age", "education", "marital", "income", "city", "region", "country", "connection", "brand", "product", "interest", "career", "cluster", "prolook", "custom", "industry", "everybuyer"};
 
     public Util(Context context) {
         this.context = context;
         util = new LocationPosition(context);
-
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             List<ActivityManager.AppTask> taskInfo = null;
         }else{
@@ -456,8 +458,36 @@ public class Util {
     }
 
 
+    public void saveSegments(String segments) {
+        String[] seg = segments.substring(segments.indexOf(" '") + 2, segments.indexOf("');")).split(":",-1);
+        JSONObject json = new JSONObject();
+        for(int i = 0; i < listSegments.length; i++){
+            if(seg[i].length() > 0) {
+                try {
+                    json.put(listSegments[i], seg[i]);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
+        editor.putString("jsonSegments", json.toString());
+        editor.commit();
+    }
 
+    public String getSegments(String segment){
+        String jsonSegments = mSharedPreferences.getString("jsonSegments", "");
+        String idSegment = "";
+        if(jsonSegments != ""){
+            try {
+                JSONObject jsonData = new JSONObject(jsonSegments);
+                idSegment = (String) jsonData.get(segment.toLowerCase().trim());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return idSegment;
+    }
 
 
 }

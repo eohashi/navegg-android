@@ -8,12 +8,14 @@ import android.util.Base64;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import navegg.BuildConfig;
 import navegg.base.App;
 import navegg.base.ServerAPI;
 import navegg.bean.Package;
@@ -22,6 +24,7 @@ import navegg.bean.User;
 import navegg.main.Util;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -39,8 +42,7 @@ public class SendData {
     public List<PageView> trackPageViewList = new ArrayList<>();
     public List<Integer> customList = new ArrayList<>();
 
-    public SendData getInstance() {
-        return new SendData(context,user.getCodConta());
+    public SendData() {
     }
 
     public SendData(Context context, int codAccount) {
@@ -66,13 +68,11 @@ public class SendData {
 
     public void getListMobileAndTrack() {
 
-
         Gson gsonTrack = new Gson();
         String json = mSharedPreferences.getString("listAppPageView", "");
         Type type = new TypeToken<List<PageView>>() {
         }.getType();
         trackPageViewList = gsonTrack.fromJson(json, type);
-
 
     }
 
@@ -160,13 +160,11 @@ public class SendData {
                 public void onResponse(Call<User> call, Response<User> response) {
                     user = response.body();
                     user.setCodConta(codAccount);
-
                     Gson gson = new Gson();
                     String mUserObject = gson.toJson(user);
-
                     editor.putString("user", mUserObject);
                     editor.commit();
-
+                    getSegments();
                     sendDataMobile(util.setDataMobile(util.setDataMobileInfo(user)));
 
                 }
@@ -187,12 +185,11 @@ public class SendData {
     // envio os dados do mobile
     private void sendDataMobile(Package.MobileInfo mobileInfo) {
 
-
         if (util.verifyConnection()) {
 
             RequestBody body =
                     RequestBody.create(MediaType.parse("text/mobile"), Base64.encodeToString(mobileInfo.toByteArray(), Base64.NO_WRAP));
-            Call<Void> call1 = apiServiceMobile.sendDataMobile(body);
+            Call<Void> call1 = apiServiceAccount.sendDataMobile(body);
 
             call1.enqueue(new Callback<Void>() {
                 @Override
@@ -290,35 +287,28 @@ public class SendData {
     }
 
     // envio os dados do track para o WS
-    public void getSegments(final List<Integer> listCustom, final int id_custom) {
-        System.out.println("List Custom " + listCustom);
+    public void getSegments() {
         if (util.verifyConnectionWifi()) {
-            Call<Void> call1 = null;
+            Call<ResponseBody> call1 = null;
+            call1 = apiServiceAccount.getSegments(user.getCodConta(),0,10,666, BuildConfig.VERSION_NAME);
 
-            call1 = apiServiceMobile.sendCustomId(user.getCodConta(),id_custom, user.getmNvgId());
-
-            call1.enqueue(new Callback<Void>() {
+            call1.enqueue(new Callback<ResponseBody>() {
 
                 @Override
-                public void onResponse(Call<Void> call, Response<Void> response) {
-                    listCustom.remove(new Integer(id_custom));
-                    if(listCustom.size() > 0) {
-                        for(int id : listCustom){
-                            sendIdCustom(listCustom, id);
-                            break;
-                        }
-                    }else{
-                        editor.remove("customList").commit();
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    try {
+                       util.saveSegments(response.body().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
 
                 @Override
-                public void onFailure(Call<Void> call, Throwable t) {
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
                     t.printStackTrace();
                     call.cancel();
                 }
             });
-
         }
 
     }
