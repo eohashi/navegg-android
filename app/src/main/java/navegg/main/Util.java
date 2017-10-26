@@ -476,6 +476,7 @@ public class Util {
     }
 
     public String getSegments(String segment){
+
         String jsonSegments = mSharedPreferences.getString("jsonSegments", "");
         String idSegment = "";
         if(jsonSegments != ""){
@@ -486,6 +487,9 @@ public class Util {
                 e.printStackTrace();
             }
         }
+
+        System.out.println("ID SEGMENT "+ idSegment);
+
         return idSegment;
     }
 

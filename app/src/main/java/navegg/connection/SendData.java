@@ -160,11 +160,11 @@ public class SendData {
                 public void onResponse(Call<User> call, Response<User> response) {
                     user = response.body();
                     user.setCodConta(codAccount);
+                    getSegments();
                     Gson gson = new Gson();
                     String mUserObject = gson.toJson(user);
                     editor.putString("user", mUserObject);
                     editor.commit();
-                    getSegments();
                     sendDataMobile(util.setDataMobile(util.setDataMobileInfo(user)));
 
                 }

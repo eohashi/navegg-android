@@ -21,7 +21,6 @@ public class VerifyStateConnection extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
 
         util = new Util(context);
-        System.out.println("TROCANDO DE STATE MOBILE");
         mSharedPreferences = context.getSharedPreferences("SDK", Context.MODE_PRIVATE);
         editor = mSharedPreferences.edit();
         editor.putBoolean("broadCastRunning", true);

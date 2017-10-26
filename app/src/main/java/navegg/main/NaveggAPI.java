@@ -31,7 +31,7 @@ public class NaveggAPI {
         setDataDevice();
         this.mSharedPreferences = context.getSharedPreferences("SDK", Context.MODE_PRIVATE);
         boolean broadCast = mSharedPreferences.getBoolean("broadCastRunning", false);
-
+        System.out.println("BROAD CAST RECEIVER "+ broadCast);
         if(!broadCast) {
             IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
@@ -68,10 +68,10 @@ public class NaveggAPI {
         sendData.setCustomInMobile(id_custom);
     }
 
-    public String getSegments(final String segment){
-        String seg = util.getSegments(segment);
-        return seg;
+    public String getSegments(String segment) {
+        return util.getSegments(segment);
     }
+
 
 
 
