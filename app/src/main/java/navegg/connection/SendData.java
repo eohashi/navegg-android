@@ -38,9 +38,10 @@ public class SendData {
     private SharedPreferences.Editor editor;
     private Context context;
     private Util util;
-    private ServerAPI apiServiceAccount, apiServiceMobile;
+    private ServerAPI apiServiceAccount, apiServiceMobile, apiServiceOnBoarding;
     public List<PageView> trackPageViewList = new ArrayList<>();
     public List<Integer> customList = new ArrayList<>();
+    public List<String> onBoardingList = new ArrayList<>();
 
     public SendData() {
     }
@@ -52,6 +53,8 @@ public class SendData {
 
         apiServiceAccount = App.getClient().create(ServerAPI.class);
         apiServiceMobile = App.sendDataProto().create(ServerAPI.class);
+        apiServiceOnBoarding = App.sendDataOnBoarding().create(ServerAPI.class);
+
         this.codAccount = codAccount;
 
         this.mSharedPreferences = context.getSharedPreferences("SDK", Context.MODE_PRIVATE);
@@ -59,6 +62,7 @@ public class SendData {
 
         getListMobileAndTrack();
         getListIdCustom();
+        getListOnBoarding();
 
         Gson gson = new Gson();
         String json = mSharedPreferences.getString("user", "");
@@ -83,6 +87,17 @@ public class SendData {
         Type type = new TypeToken<List<Integer>>() {
         }.getType();
         customList = gsonTrack.fromJson(json, type);
+
+
+    }
+
+    public void getListOnBoarding() {
+
+        Gson gsonTrack = new Gson();
+        String json = mSharedPreferences.getString("onBoardingList", "");
+        Type type = new TypeToken<List<String>>() {
+        }.getType();
+        onBoardingList = gsonTrack.fromJson(json, type);
 
 
     }
@@ -142,6 +157,31 @@ public class SendData {
 
         } else {
             setInListCustom(id_custom);
+        }
+
+    }
+
+    public void setOnBoardingMobile(String onBoarding) {
+
+
+        if (user != null) {
+
+            if (!mSharedPreferences.getBoolean("sendDataMobile", true)) {
+                sendDataMobile(util.setDataMobile(util.setDataMobileInfo(user)));
+            }
+
+            // insiro na lista de onBoard
+            // se caso falhe a conexão na hora de enviar os dados.
+            setInListOnBoarding(onBoarding);
+            getListOnBoarding();
+
+
+            if (onBoardingList != null) {
+                sendOnBoardingMobile(onBoardingList, onBoarding);
+            }
+
+        } else {
+            setInListOnBoarding(onBoarding);
         }
 
     }
@@ -254,7 +294,7 @@ public class SendData {
 
     // envio os dados do track para o WS
     public void sendIdCustom(final List<Integer> listCustom, final int id_custom) {
-        System.out.println("List Custom " + listCustom);
+
         if (util.verifyConnectionWifi()) {
             Call<Void> call1 = null;
 
@@ -274,19 +314,16 @@ public class SendData {
                         editor.remove("customList").commit();
                     }
                 }
-
                 @Override
                 public void onFailure(Call<Void> call, Throwable t) {
                     t.printStackTrace();
                     call.cancel();
                 }
             });
-
         }
-
     }
 
-    // envio os dados do track para o WS
+    // retornando os segmentos do WS
     public void getSegments() {
         if (util.verifyConnectionWifi()) {
             Call<ResponseBody> call1 = null;
@@ -312,6 +349,38 @@ public class SendData {
         }
 
     }
+
+
+    // Onboarding
+    public void sendOnBoardingMobile(final List<String> listOnBoarding, final String boarding) {
+        if (util.verifyConnectionWifi()) {
+            Call<Void> call1 = null;
+            call1 = apiServiceOnBoarding.setOnBoarding(user.getmNvgId(),user.getCodConta(),boarding);
+
+            call1.enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    onBoardingList.remove(new String(boarding));
+                    if(listOnBoarding.size() > 0) {
+                        for(String boarding : listOnBoarding){
+                            sendOnBoardingMobile(listOnBoarding, boarding);
+                            break;
+                        }
+                    }else{
+                        editor.remove("onBoardingList").commit();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    t.printStackTrace();
+                    call.cancel();
+                }
+            });
+        }
+
+    }
+
 
 
     public void setListTrackInShared(PageView pageViewData) {
@@ -342,6 +411,21 @@ public class SendData {
         String json = gson.toJson(customList);
         editor.remove("customList").commit();
         editor.putString("customList", json);
+        editor.commit();
+
+    }
+
+    public void setInListOnBoarding(String onBoarding) {
+
+        if (onBoardingList == null) {
+            onBoardingList = new ArrayList<>();
+        }
+
+        onBoardingList.add(onBoarding);
+        Gson gson = new Gson();
+        String json = gson.toJson(onBoardingList);
+        editor.remove("onBoardingList").commit();
+        editor.putString("onBoardingList", json);
         editor.commit();
 
     }

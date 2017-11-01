@@ -18,6 +18,8 @@ public class App {
     //public static final String ENDPOINT2 = "http://192.168.1.113";
     public static final String ENDPOINT2 = "http://cdn.navdmp.com";
 
+    public static final String ENDPOINT3 = "http://cd.navdmp.com";
+
 
 
     public static Retrofit getClient() {
@@ -28,7 +30,7 @@ public class App {
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
 
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        logging.setLevel(HttpLoggingInterceptor.Level.NONE);
 
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
@@ -50,7 +52,7 @@ public class App {
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
 // set your desired log level
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        logging.setLevel(HttpLoggingInterceptor.Level.NONE);
 
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 // add your other interceptors …
@@ -61,6 +63,30 @@ public class App {
 
         retrofitProto = new Retrofit.Builder()
                 .baseUrl(ENDPOINT2)
+                .addConverterFactory(ProtoConverterFactory.create())
+                .client(httpClient.build())
+                .build();
+
+
+        return retrofitProto;
+    }
+
+    public static Retrofit sendDataOnBoarding() {
+
+
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+// set your desired log level
+        logging.setLevel(HttpLoggingInterceptor.Level.NONE);
+
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+// add your other interceptors …
+
+// add logging as last interceptor
+        httpClient.addInterceptor(logging);  // <-- this is the important line!
+
+
+        retrofitProto = new Retrofit.Builder()
+                .baseUrl(ENDPOINT3)
                 .addConverterFactory(ProtoConverterFactory.create())
                 .client(httpClient.build())
                 .build();

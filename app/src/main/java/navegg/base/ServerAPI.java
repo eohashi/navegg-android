@@ -26,4 +26,7 @@ public interface ServerAPI {
 
     @GET("/usr")
     Call<ResponseBody> getSegments(@Query("acc") int acc, @Query("wst") int wst, @Query("v") int v, @Query("id") long id_user, @Query("asdk") String version_sdk);
+
+    @GET("/cd")
+    Call<Void> setOnBoarding(@Query("id") long id, @Query("prtid") int partnerId, @Query("prtusride") String usride);
 }

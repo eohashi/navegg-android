@@ -30,29 +30,41 @@ public class VerifyStateConnection extends BroadcastReceiver {
         Gson gson = new Gson();
         String json = mSharedPreferences.getString("user", "");
         user = gson.fromJson(json, User.class);
-        System.out.println("USER RECEIVER "+ user);
         if(user != null) {
             sendData = new SendData(context, user.getCodConta());
-            System.out.println("TROCANDO DE STATE MOBILE");
             if (util.verifyConnection()) {
-                System.out.println("ENVIANDO DADOS PELO BROADCAST RECEIVER");
                 sendData.getListIdCustom();
                 sendData.getListMobileAndTrack();
+                sendData.getListOnBoarding();
 
                 receiverSendCustom();
                 receiverSendTrackMobile();
+                receiverSendOnBoard();
             }
         }
     }
 
     private void receiverSendTrackMobile() {
-        sendData.sendDataTrack(sendData.trackPageViewList);
+        if(sendData.trackPageViewList != null)
+            sendData.sendDataTrack(sendData.trackPageViewList);
     }
 
     private void receiverSendCustom(){
-        for(int id_custom: sendData.customList){
-            sendData.sendIdCustom(sendData.customList, id_custom);
-            break;
+        if(sendData.customList != null) {
+            for (int id_custom : sendData.customList) {
+                sendData.sendIdCustom(sendData.customList, id_custom);
+                break;
+            }
         }
+    }
+
+    private void receiverSendOnBoard(){
+        if(sendData.onBoardingList != null){
+            for(String onBoard : sendData.onBoardingList){
+                sendData.sendOnBoardingMobile(sendData.onBoardingList,onBoard);
+                break;
+            }
+        }
+
     }
 }

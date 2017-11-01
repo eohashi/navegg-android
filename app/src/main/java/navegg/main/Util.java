@@ -488,7 +488,6 @@ public class Util {
             }
         }
 
-        System.out.println("ID SEGMENT "+ idSegment);
 
         return idSegment;
     }

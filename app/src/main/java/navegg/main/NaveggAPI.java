@@ -14,7 +14,6 @@ import navegg.connection.SendData;
 
 //import android.support.v7.widget.Toolbar;
 
-
 public class NaveggAPI {
 
     private Context context;
@@ -31,7 +30,6 @@ public class NaveggAPI {
         setDataDevice();
         this.mSharedPreferences = context.getSharedPreferences("SDK", Context.MODE_PRIVATE);
         boolean broadCast = mSharedPreferences.getBoolean("broadCastRunning", false);
-        System.out.println("BROAD CAST RECEIVER "+ broadCast);
         if(!broadCast) {
             IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
@@ -70,6 +68,10 @@ public class NaveggAPI {
 
     public String getSegments(String segment) {
         return util.getSegments(segment);
+    }
+
+    public void setOnBoarding(String OnBoarding) {
+        sendData.setOnBoardingMobile(OnBoarding);
     }
 
 
