@@ -1,5 +1,7 @@
 package navegg.base;
 
+import java.util.Map;
+
 import navegg.bean.User;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -8,6 +10,7 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
+import retrofit2.http.QueryMap;
 
 
 public interface ServerAPI {
@@ -28,5 +31,5 @@ public interface ServerAPI {
     Call<ResponseBody> getSegments(@Query("acc") int acc, @Query("wst") int wst, @Query("v") int v, @Query("id") long id_user, @Query("asdk") String version_sdk);
 
     @GET("/cd")
-    Call<Void> setOnBoarding(@Query("id") long id, @Query("prtid") int partnerId, @Query("prtusride") String usride);
+    Call<Void> setOnBoarding(@QueryMap Map<String,String> params, @Query("id") long id, @Query("prtid") int partnerId);
 }

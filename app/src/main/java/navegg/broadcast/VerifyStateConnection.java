@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
 
+import navegg.bean.OnBoarding;
 import navegg.bean.User;
 import navegg.connection.SendData;
 import navegg.main.Util;
@@ -60,7 +61,7 @@ public class VerifyStateConnection extends BroadcastReceiver {
 
     private void receiverSendOnBoard(){
         if(sendData.onBoardingList != null){
-            for(String onBoard : sendData.onBoardingList){
+            for(OnBoarding onBoard : sendData.onBoardingList){
                 sendData.sendOnBoardingMobile(sendData.onBoardingList,onBoard);
                 break;
             }

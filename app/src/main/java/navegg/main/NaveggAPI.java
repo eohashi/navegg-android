@@ -70,12 +70,8 @@ public class NaveggAPI {
         return util.getSegments(segment);
     }
 
-    public void setOnBoarding(String OnBoarding) {
-        sendData.setOnBoardingMobile(OnBoarding);
+    public void setOnBoarding(String params, String OnBoarding) {
+        sendData.setOnBoardingMobile(params,OnBoarding);
     }
-
-
-
-
 
 }

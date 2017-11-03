@@ -13,11 +13,14 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import navegg.BuildConfig;
 import navegg.base.App;
 import navegg.base.ServerAPI;
+import navegg.bean.OnBoarding;
 import navegg.bean.Package;
 import navegg.bean.PageView;
 import navegg.bean.User;
@@ -41,7 +44,7 @@ public class SendData {
     private ServerAPI apiServiceAccount, apiServiceMobile, apiServiceOnBoarding;
     public List<PageView> trackPageViewList = new ArrayList<>();
     public List<Integer> customList = new ArrayList<>();
-    public List<String> onBoardingList = new ArrayList<>();
+    public List<OnBoarding> onBoardingList = new ArrayList<>();
 
     public SendData() {
     }
@@ -95,7 +98,7 @@ public class SendData {
 
         Gson gsonTrack = new Gson();
         String json = mSharedPreferences.getString("onBoardingList", "");
-        Type type = new TypeToken<List<String>>() {
+        Type type = new TypeToken<List<OnBoarding>>() {
         }.getType();
         onBoardingList = gsonTrack.fromJson(json, type);
 
@@ -161,8 +164,11 @@ public class SendData {
 
     }
 
-    public void setOnBoardingMobile(String onBoarding) {
+    public void setOnBoardingMobile(String params,String onBoarding) {
 
+        OnBoarding onBoard = new OnBoarding();
+        onBoard.setMethod(params);
+        onBoard.setSha1(onBoarding);
 
         if (user != null) {
 
@@ -170,18 +176,19 @@ public class SendData {
                 sendDataMobile(util.setDataMobile(util.setDataMobileInfo(user)));
             }
 
+
             // insiro na lista de onBoard
             // se caso falhe a conexão na hora de enviar os dados.
-            setInListOnBoarding(onBoarding);
+            setInListOnBoarding(onBoard);
             getListOnBoarding();
 
 
             if (onBoardingList != null) {
-                sendOnBoardingMobile(onBoardingList, onBoarding);
+                sendOnBoardingMobile(onBoardingList, onBoard);
             }
 
         } else {
-            setInListOnBoarding(onBoarding);
+            setInListOnBoarding(onBoard);
         }
 
     }
@@ -352,17 +359,19 @@ public class SendData {
 
 
     // Onboarding
-    public void sendOnBoardingMobile(final List<String> listOnBoarding, final String boarding) {
+    public void sendOnBoardingMobile(final List<OnBoarding> listOnBoarding, final OnBoarding boarding) {
         if (util.verifyConnectionWifi()) {
             Call<Void> call1 = null;
-            call1 = apiServiceOnBoarding.setOnBoarding(user.getmNvgId(),user.getCodConta(),boarding);
+            Map<String,String> params = new HashMap<>();
+            params.put(boarding.getMethod(),boarding.getSha1());
+            call1 = apiServiceOnBoarding.setOnBoarding(params,user.getmNvgId(),user.getCodConta());
 
             call1.enqueue(new Callback<Void>() {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
-                    onBoardingList.remove(new String(boarding));
+                    onBoardingList.remove(boarding);
                     if(listOnBoarding.size() > 0) {
-                        for(String boarding : listOnBoarding){
+                        for(OnBoarding boarding : listOnBoarding){
                             sendOnBoardingMobile(listOnBoarding, boarding);
                             break;
                         }
@@ -415,7 +424,7 @@ public class SendData {
 
     }
 
-    public void setInListOnBoarding(String onBoarding) {
+    public void setInListOnBoarding(OnBoarding onBoarding) {
 
         if (onBoardingList == null) {
             onBoardingList = new ArrayList<>();
