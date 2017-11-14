@@ -22,7 +22,7 @@ public class VerifyStateConnection extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
 
         util = new Util(context);
-        mSharedPreferences = context.getSharedPreferences("SDK", Context.MODE_PRIVATE);
+        mSharedPreferences = context.getSharedPreferences("NVGSDK", Context.MODE_PRIVATE);
         editor = mSharedPreferences.edit();
         editor.putBoolean("broadCastRunning", true);
         editor.commit();

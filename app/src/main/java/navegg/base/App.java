@@ -3,99 +3,46 @@ package navegg.base;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.util.HashMap;
+
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Converter;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.protobuf.ProtoConverterFactory;
 
 
 public class App {
+    private static final HashMap ENDPOINTS= new HashMap(){{
+        put("user", "usr");
+        put("request", "cdn");
+        put("onboarding", "cd");
 
-    private static Retrofit retrofit, retrofitProto, retrofitCustom= null;
-    public static final String ENDPOINT = "http://usr.navdmp.com";
-
-    //public static final String ENDPOINT2 = "http://192.168.1.113";
-    public static final String ENDPOINT2 = "http://cdn.navdmp.com";
-
-    public static final String ENDPOINT3 = "http://cd.navdmp.com";
+    }};
 
 
+    private static String getEndpoint(String endpoint) {
+        return "http://"+ENDPOINTS.get(endpoint)+".navdmp.com";
+    }
 
-    public static Retrofit getClient() {
 
-        Gson gson = new GsonBuilder()
-                .setLenient()
-                .create();
-
+    private static Retrofit.Builder getRetrofitBuilder(){
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-
         logging.setLevel(HttpLoggingInterceptor.Level.NONE);
-
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-
         httpClient.addInterceptor(logging);
-
-        retrofit = new Retrofit.Builder()
-                .baseUrl(ENDPOINT)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .client(httpClient.build())
-                .build();
-
-
-        return retrofit;
+        return new Retrofit.Builder().client(httpClient.build());
     }
 
 
-    public static Retrofit sendDataProto() {
+    public static Retrofit getRetrofit(String endpoint, Converter.Factory fctr){
 
-
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-// set your desired log level
-        logging.setLevel(HttpLoggingInterceptor.Level.NONE);
-
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-// add your other interceptors …
-
-// add logging as last interceptor
-        httpClient.addInterceptor(logging);  // <-- this is the important line!
-
-
-        retrofitProto = new Retrofit.Builder()
-                .baseUrl(ENDPOINT2)
-                .addConverterFactory(ProtoConverterFactory.create())
-                .client(httpClient.build())
+        Retrofit.Builder retrofitBuilder = getRetrofitBuilder();
+        return retrofitBuilder
+                .baseUrl(getEndpoint(endpoint))
+                .addConverterFactory(fctr)
                 .build();
-
-
-        return retrofitProto;
     }
-
-    public static Retrofit sendDataOnBoarding() {
-
-
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-// set your desired log level
-        logging.setLevel(HttpLoggingInterceptor.Level.NONE);
-
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-// add your other interceptors …
-
-// add logging as last interceptor
-        httpClient.addInterceptor(logging);  // <-- this is the important line!
-
-
-        retrofitProto = new Retrofit.Builder()
-                .baseUrl(ENDPOINT3)
-                .addConverterFactory(ProtoConverterFactory.create())
-                .client(httpClient.build())
-                .build();
-
-
-        return retrofitProto;
-    }
-
-
-
 
 }

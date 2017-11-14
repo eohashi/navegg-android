@@ -12,8 +12,6 @@ import navegg.bean.User;
 import navegg.broadcast.VerifyStateConnection;
 import navegg.connection.SendData;
 
-//import android.support.v7.widget.Toolbar;
-
 public class NaveggAPI {
 
     private Context context;
@@ -28,7 +26,7 @@ public class NaveggAPI {
         sendData = new SendData(ctx, codAccount);
         handler = new Handler();
         setDataDevice();
-        this.mSharedPreferences = context.getSharedPreferences("SDK", Context.MODE_PRIVATE);
+        this.mSharedPreferences = context.getSharedPreferences("NVGSDK", Context.MODE_PRIVATE);
         boolean broadCast = mSharedPreferences.getBoolean("broadCastRunning", false);
         if(!broadCast) {
             IntentFilter intentFilter = new IntentFilter();
@@ -44,7 +42,7 @@ public class NaveggAPI {
         util.getCallPage();
         util.getVisibleFragment();
 
-        this.mSharedPreferences = context.getSharedPreferences("SDK", Context.MODE_PRIVATE);
+        this.mSharedPreferences = context.getSharedPreferences("NVGSDK", Context.MODE_PRIVATE);
 
         Gson gson = new Gson();
         String json = mSharedPreferences.getString("user", "");
@@ -55,12 +53,9 @@ public class NaveggAPI {
         }
     }
 
-
-
     public void setTrackPage(String mActivity){
         sendData.trackMobile(mActivity);
     }
-
 
     public void setCustom(int id_custom){
         sendData.setCustomInMobile(id_custom);

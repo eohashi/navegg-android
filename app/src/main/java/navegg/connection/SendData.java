@@ -6,6 +6,7 @@ import android.provider.Settings;
 import android.util.Base64;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
@@ -31,6 +32,8 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.protobuf.ProtoConverterFactory;
 
 
 public class SendData {
@@ -46,21 +49,19 @@ public class SendData {
     public List<Integer> customList = new ArrayList<>();
     public List<OnBoarding> onBoardingList = new ArrayList<>();
 
-    public SendData() {
-    }
-
     public SendData(Context context, int codAccount) {
 
         this.context = context;
         util = new Util(this.context);
 
-        apiServiceAccount = App.getClient().create(ServerAPI.class);
-        apiServiceMobile = App.sendDataProto().create(ServerAPI.class);
-        apiServiceOnBoarding = App.sendDataOnBoarding().create(ServerAPI.class);
+        //apiServiceAccount = App.getClient().create(ServerAPI.class);
+        apiServiceAccount = App.getRetrofit("user", GsonConverterFactory.create(new GsonBuilder().setLenient().create())).create(ServerAPI.class);
+        apiServiceMobile = App.getRetrofit("request",ProtoConverterFactory.create()).create(ServerAPI.class);
+        apiServiceOnBoarding = App.getRetrofit("onboarding", ProtoConverterFactory.create()).create(ServerAPI.class);
 
         this.codAccount = codAccount;
 
-        this.mSharedPreferences = context.getSharedPreferences("SDK", Context.MODE_PRIVATE);
+        this.mSharedPreferences = context.getSharedPreferences("NVGSDK", Context.MODE_PRIVATE);
         editor = mSharedPreferences.edit();
 
         getListMobileAndTrack();

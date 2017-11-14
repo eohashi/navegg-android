@@ -67,7 +67,7 @@ public class Util {
         }else{
             List<ActivityManager.RunningTaskInfo> taskInfo = null;
         }
-        this.mSharedPreferences = context.getSharedPreferences("SDK", Context.MODE_PRIVATE);
+        this.mSharedPreferences = context.getSharedPreferences("NVGSDK", Context.MODE_PRIVATE);
         editor = mSharedPreferences.edit();
 
     }
@@ -275,6 +275,7 @@ public class Util {
     public Fragment getVisibleFragment() {
         String fragClassName = null;
         List<Fragment> fragments = ((FragmentActivity) context).getSupportFragmentManager().getFragments();
+        if(fragments == null) return null;
         for (Fragment fragment : fragments) {
             if (fragment != null) {
                 fragClassName = fragment.getClass().getName();
