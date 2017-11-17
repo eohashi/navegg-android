@@ -32,7 +32,7 @@ public class VerifyStateConnection extends BroadcastReceiver {
         String json = mSharedPreferences.getString("user", "");
         user = gson.fromJson(json, User.class);
         if(user != null) {
-            sendData = new SendData(context, user.getCodConta());
+            sendData = new SendData(context, user.getAccountId());
             if (util.verifyConnection()) {
                 sendData.getListIdCustom();
                 sendData.getListMobileAndTrack();

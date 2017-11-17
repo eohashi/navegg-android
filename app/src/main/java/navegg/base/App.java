@@ -29,7 +29,7 @@ public class App {
 
     private static Retrofit.Builder getRetrofitBuilder(){
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        logging.setLevel(HttpLoggingInterceptor.Level.NONE);
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         httpClient.addInterceptor(logging);
         return new Retrofit.Builder().client(httpClient.build());

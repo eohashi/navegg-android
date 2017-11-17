@@ -14,33 +14,24 @@ public class User {
     @SerializedName("nvgid")
     private long mNvgId;
 
-    private int codConta;
+    private int accountId;
 
 
     public User() {
     }
 
-    public String getmStatus() {
-        return mStatus;
-    }
-
-    public void setmStatus(String mStatus) {
-        this.mStatus = mStatus;
-    }
 
     public long getmNvgId() {
         return mNvgId;
     }
 
-    public void setmNvgId(long mNvgId) {
-        this.mNvgId = mNvgId;
+    public int getAccountId() {
+        return accountId;
     }
 
-    public int getCodConta() {
-        return codConta;
+    public void setAccountId(int codConta) {
+        this.accountId = codConta;
     }
 
-    public void setCodConta(int codConta) {
-        this.codConta = codConta;
-    }
+    public long getId (){ return this.mNvgId;}
 }

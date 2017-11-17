@@ -70,7 +70,7 @@ public class SendData {
 
         Gson gson = new Gson();
         String json = mSharedPreferences.getString("user", "");
-        user = gson.fromJson(json, User.class);
+        this.user = gson.fromJson(json, User.class);
 
     }
 
@@ -110,10 +110,10 @@ public class SendData {
     public void trackMobile(String mActivity) {
 
 
-        if (user != null) {
+        if (this.user != null) {
 
             if (!mSharedPreferences.getBoolean("sendDataMobile", true)) {
-                sendDataMobile(util.setDataMobile(util.setDataMobileInfo(user)));
+                sendDataMobile(util.getDataMobile(this.user));
             }
 
             setListTrackInShared(util.setDataPageView(mActivity));
@@ -143,10 +143,10 @@ public class SendData {
     public void setCustomInMobile(int id_custom) {
 
 
-        if (user != null) {
+        if (this.user != null) {
 
             if (!mSharedPreferences.getBoolean("sendDataMobile", true)) {
-                sendDataMobile(util.setDataMobile(util.setDataMobileInfo(user)));
+                sendDataMobile(util.getDataMobile(this.user));
             }
 
             // insiro na lista de custom o id_custom
@@ -171,10 +171,10 @@ public class SendData {
         onBoard.setMethod(params);
         onBoard.setSha1(onBoarding);
 
-        if (user != null) {
+        if (this.user != null) {
 
             if (!mSharedPreferences.getBoolean("sendDataMobile", true)) {
-                sendDataMobile(util.setDataMobile(util.setDataMobileInfo(user)));
+                sendDataMobile(util.getDataMobile(this.user));
             }
 
 
@@ -207,13 +207,13 @@ public class SendData {
                 @Override
                 public void onResponse(Call<User> call, Response<User> response) {
                     user = response.body();
-                    user.setCodConta(codAccount);
+                    user.setAccountId(codAccount);
                     getSegments();
                     Gson gson = new Gson();
                     String mUserObject = gson.toJson(user);
                     editor.putString("user", mUserObject);
                     editor.commit();
-                    sendDataMobile(util.setDataMobile(util.setDataMobileInfo(user)));
+                    sendDataMobile(util.getDataMobile(user));
 
                 }
 
@@ -267,10 +267,10 @@ public class SendData {
     public void sendDataTrack(List<PageView> pageView) {
 
         Package.Track trackMob = null;
-        trackMob = util.setDataTrack(util.setDataBeanTrack(user, pageView), util.setListDataPageView(pageView));
+        trackMob = util.setDataTrack(util.setDataBeanTrack(this.user, pageView), util.setListDataPageView(pageView));
         trackMob.toBuilder()
-                .setAcc(user.getCodConta())
-                .setUserId(user.getmNvgId()).build();
+                .setAcc(this.user.getAccountId())
+                .setUserId(this.user.getmNvgId()).build();
 
         if (util.verifyConnectionWifi()) {
 
@@ -306,7 +306,7 @@ public class SendData {
         if (util.verifyConnectionWifi()) {
             Call<Void> call1 = null;
 
-            call1 = apiServiceMobile.sendCustomId(user.getCodConta(),id_custom, user.getmNvgId());
+            call1 = apiServiceMobile.sendCustomId(this.user.getAccountId(),id_custom, this.user.getmNvgId());
 
             call1.enqueue(new Callback<Void>() {
 
@@ -335,7 +335,7 @@ public class SendData {
     public void getSegments() {
         if (util.verifyConnectionWifi()) {
             Call<ResponseBody> call1 = null;
-            call1 = apiServiceAccount.getSegments(user.getCodConta(),0,10,666, BuildConfig.VERSION_NAME);
+            call1 = apiServiceAccount.getSegments(this.user.getAccountId(),0,10,666, BuildConfig.VERSION_NAME);
 
             call1.enqueue(new Callback<ResponseBody>() {
 
@@ -365,7 +365,7 @@ public class SendData {
             Call<Void> call1 = null;
             Map<String,String> params = new HashMap<>();
             params.put(boarding.getMethod(),boarding.getSha1());
-            call1 = apiServiceOnBoarding.setOnBoarding(params,user.getmNvgId(),user.getCodConta());
+            call1 = apiServiceOnBoarding.setOnBoarding(params, this.user.getmNvgId(), this.user.getAccountId());
 
             call1.enqueue(new Callback<Void>() {
                 @Override

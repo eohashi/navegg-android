@@ -329,8 +329,33 @@ public class Util {
         return connected;
     }
 
+    public Package.MobileInfo getDataMobile(User user) {
 
-    public Package.MobileInfo setDataMobile(MobileInfo mobileInfo) {
+        return Package.MobileInfo.newBuilder()
+                .setDeviceId(Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID))
+                .setPlatform("Android")
+                .setLongitude(getLong())
+                .setLatitude(getLat())
+                .setAndroidName(Build.DEVICE)
+                .setAndroidBrand(Build.BRAND)
+                .setAndroidModel(Build.MODEL)
+                .setVersionRelease(Build.VERSION.RELEASE)
+                .setManufacturer(Build.MANUFACTURER)
+                .setVersionLib(BuildConfig.VERSION_NAME)
+                .setVersionCode(BuildConfig.VERSION_CODE)
+                .setVersionOS(Build.VERSION.SDK_INT)
+                .setAndroidFingerPrint(Build.FINGERPRINT)
+                .setUserAgent(new WebView(context).getSettings().getUserAgentString())
+                .setLinkPlayStore(getLinkPlayStore())
+                .setTypeCategory(getTypeCategory())
+                .setImei(getIMEI())
+                .setSoftwareVersion(getSoftwareVersion())
+                .setUserId(user.getmNvgId())
+                .setAcc(user.getAccountId())
+                .build();
+    }
+
+    /*public Package.MobileInfo setDataMobile(MobileInfo mobileInfo) {
 
 
         Package.MobileInfo mMobileInfo = Package.MobileInfo.newBuilder()
@@ -386,12 +411,12 @@ public class Util {
         mobileInfo.setTypeCategory(getTypeCategory());
         mobileInfo.setImei(getIMEI());
         mobileInfo.setSoftwareVersion(getSoftwareVersion());
-        mobileInfo.setAcc(user.getCodConta());
+        mobileInfo.setAcc(user.getAccountId());
         mobileInfo.setUserId(user.getmNvgId());
 
 
         return mobileInfo;
-    }
+    }*/
 
 
     public Package.Track setDataTrack(Track track, List<Package.PageView> listPageView) {
@@ -417,7 +442,7 @@ public class Util {
     public Track setDataBeanTrack(User user, List<PageView> pageView){
 
         Track track = new Track();
-        track.setAcc((user != null) ? user.getCodConta() : 100000000);
+        track.setAcc((user != null) ? user.getAccountId() : 100000000);
         track.setUserId((user != null) ? user.getmNvgId() : 100000000);
         track.setNameApp(context.getString(R.string.app_name));
         track.setDeviceIP(getMobileIP(context));

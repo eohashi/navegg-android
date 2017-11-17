@@ -21,9 +21,9 @@ public class NaveggAPI {
     private User user = new User();
     private Handler handler;
 
-    public NaveggAPI(Context ctx, final int codAccount) {
+    public NaveggAPI(Context ctx, final int accountId) {
         this.context = ctx;
-        sendData = new SendData(ctx, codAccount);
+        sendData = new SendData(ctx, accountId);
         handler = new Handler();
         setDataDevice();
         this.mSharedPreferences = context.getSharedPreferences("NVGSDK", Context.MODE_PRIVATE);
@@ -63,6 +63,12 @@ public class NaveggAPI {
 
     public String getSegments(String segment) {
         return util.getSegments(segment);
+    }
+
+    public long getUserId() {
+        Gson gson = new Gson();
+        String json = mSharedPreferences.getString("user", "");
+        return gson.fromJson(json, User.class).getId();
     }
 
     public void setOnBoarding(String params, String OnBoarding) {
