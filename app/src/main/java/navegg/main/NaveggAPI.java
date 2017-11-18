@@ -10,24 +10,27 @@ import com.google.gson.Gson;
 
 import navegg.bean.User;
 import navegg.broadcast.VerifyStateConnection;
-import navegg.connection.SendData;
+import navegg.connection.WebService;
 
 public class NaveggAPI {
 
     private Context context;
-    private SharedPreferences mSharedPreferences;
+    private SharedPreferences sharedPreference;
     private Util util;
-    protected SendData sendData;
-    private User user = new User();
+    protected WebService webService;
+    private User user;
     private Handler handler;
 
-    public NaveggAPI(Context ctx, final int accountId) {
-        this.context = ctx;
-        sendData = new SendData(ctx, accountId);
+    public NaveggAPI(Context context, final int accountId) {
+        this.user = new User(context, accountId);
+
+
+        this.context = context;
+        webService = new WebService(context, this.user);
         handler = new Handler();
         setDataDevice();
-        this.mSharedPreferences = context.getSharedPreferences("NVGSDK", Context.MODE_PRIVATE);
-        boolean broadCast = mSharedPreferences.getBoolean("broadCastRunning", false);
+        this.sharedPreference = context.getSharedPreferences("NVGSDK"+accountId, Context.MODE_PRIVATE);
+        boolean broadCast = sharedPreference.getBoolean("broadCastRunning", false);
         if(!broadCast) {
             IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
@@ -42,23 +45,21 @@ public class NaveggAPI {
         util.getCallPage();
         util.getVisibleFragment();
 
-        this.mSharedPreferences = context.getSharedPreferences("NVGSDK", Context.MODE_PRIVATE);
-
         Gson gson = new Gson();
-        String json = mSharedPreferences.getString("user", "");
+        String json = sharedPreference.getString("user", "");
         user = gson.fromJson(json, User.class);
 
         if(user == null) {
-            sendData.sendFirstData();
+            webService.sendFirstData();
         }
     }
 
     public void setTrackPage(String mActivity){
-        sendData.trackMobile(mActivity);
+        webService.trackMobile(mActivity);
     }
 
     public void setCustom(int id_custom){
-        sendData.setCustomInMobile(id_custom);
+        webService.setCustomInMobile(id_custom);
     }
 
     public String getSegments(String segment) {
@@ -67,12 +68,12 @@ public class NaveggAPI {
 
     public long getUserId() {
         Gson gson = new Gson();
-        String json = mSharedPreferences.getString("user", "");
+        String json = sharedPreference.getString("user", "");
         return gson.fromJson(json, User.class).getId();
     }
 
     public void setOnBoarding(String params, String OnBoarding) {
-        sendData.setOnBoardingMobile(params,OnBoarding);
+        webService.setOnBoardingMobile(params,OnBoarding);
     }
 
 }

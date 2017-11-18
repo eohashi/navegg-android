@@ -12,13 +12,18 @@ public final class Package {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>required uint64 userId = 1;</code>
+     * <code>required string userId = 1;</code>
      */
     boolean hasUserId();
     /**
-     * <code>required uint64 userId = 1;</code>
+     * <code>required string userId = 1;</code>
      */
-    long getUserId();
+    java.lang.String getUserId();
+    /**
+     * <code>required string userId = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getUserIdBytes();
 
     /**
      * <code>required uint32 acc = 2;</code>
@@ -147,9 +152,10 @@ public final class Package {
               }
               break;
             }
-            case 8: {
+            case 10: {
+              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
-              userId_ = input.readUInt64();
+              userId_ = bs;
               break;
             }
             case 16: {
@@ -227,18 +233,45 @@ public final class Package {
 
     private int bitField0_;
     public static final int USERID_FIELD_NUMBER = 1;
-    private long userId_;
+    private java.lang.Object userId_;
     /**
-     * <code>required uint64 userId = 1;</code>
+     * <code>required string userId = 1;</code>
      */
     public boolean hasUserId() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required uint64 userId = 1;</code>
+     * <code>required string userId = 1;</code>
      */
-    public long getUserId() {
-      return userId_;
+    public java.lang.String getUserId() {
+      java.lang.Object ref = userId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          userId_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>required string userId = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getUserIdBytes() {
+      java.lang.Object ref = userId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        userId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
     }
 
     public static final int ACC_FIELD_NUMBER = 2;
@@ -418,7 +451,7 @@ public final class Package {
     }
 
     private void initFields() {
-      userId_ = 0L;
+      userId_ = "";
       acc_ = 0;
       nameApp_ = "";
       deviceIP_ = "";
@@ -461,7 +494,7 @@ public final class Package {
                         throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeUInt64(1, userId_);
+        output.writeBytes(1, getUserIdBytes());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeUInt32(2, acc_);
@@ -489,7 +522,7 @@ public final class Package {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt64Size(1, userId_);
+          .computeBytesSize(1, getUserIdBytes());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
@@ -629,7 +662,7 @@ public final class Package {
 
       public Builder clear() {
         super.clear();
-        userId_ = 0L;
+        userId_ = "";
         bitField0_ = (bitField0_ & ~0x00000001);
         acc_ = 0;
         bitField0_ = (bitField0_ & ~0x00000002);
@@ -719,7 +752,9 @@ public final class Package {
       public Builder mergeFrom(Package.Track other) {
         if (other == Package.Track.getDefaultInstance()) return this;
         if (other.hasUserId()) {
-          setUserId(other.getUserId());
+          bitField0_ |= 0x00000001;
+          userId_ = other.userId_;
+          onChanged();
         }
         if (other.hasAcc()) {
           setAcc(other.getAcc());
@@ -814,34 +849,78 @@ public final class Package {
       }
       private int bitField0_;
 
-      private long userId_ ;
+      private java.lang.Object userId_ = "";
       /**
-       * <code>required uint64 userId = 1;</code>
+       * <code>required string userId = 1;</code>
        */
       public boolean hasUserId() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required uint64 userId = 1;</code>
+       * <code>required string userId = 1;</code>
        */
-      public long getUserId() {
-        return userId_;
+      public java.lang.String getUserId() {
+        java.lang.Object ref = userId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            userId_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
       }
       /**
-       * <code>required uint64 userId = 1;</code>
+       * <code>required string userId = 1;</code>
        */
-      public Builder setUserId(long value) {
-        bitField0_ |= 0x00000001;
+      public com.google.protobuf.ByteString
+          getUserIdBytes() {
+        java.lang.Object ref = userId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          userId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>required string userId = 1;</code>
+       */
+      public Builder setUserId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
         userId_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>required uint64 userId = 1;</code>
+       * <code>required string userId = 1;</code>
        */
       public Builder clearUserId() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        userId_ = 0L;
+        userId_ = getDefaultInstance().getUserId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required string userId = 1;</code>
+       */
+      public Builder setUserIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        userId_ = value;
         onChanged();
         return this;
       }
@@ -2510,13 +2589,18 @@ public final class Package {
         getLanguageAppBytes();
 
     /**
-     * <code>required uint64 userId = 20;</code>
+     * <code>required string userId = 20;</code>
      */
     boolean hasUserId();
     /**
-     * <code>required uint64 userId = 20;</code>
+     * <code>required string userId = 20;</code>
      */
-    long getUserId();
+    java.lang.String getUserId();
+    /**
+     * <code>required string userId = 20;</code>
+     */
+    com.google.protobuf.ByteString
+        getUserIdBytes();
 
     /**
      * <code>required uint32 acc = 21;</code>
@@ -2691,9 +2775,10 @@ public final class Package {
               languageApp_ = bs;
               break;
             }
-            case 160: {
+            case 162: {
+              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00080000;
-              userId_ = input.readUInt64();
+              userId_ = bs;
               break;
             }
             case 168: {
@@ -3486,18 +3571,45 @@ public final class Package {
     }
 
     public static final int USERID_FIELD_NUMBER = 20;
-    private long userId_;
+    private java.lang.Object userId_;
     /**
-     * <code>required uint64 userId = 20;</code>
+     * <code>required string userId = 20;</code>
      */
     public boolean hasUserId() {
       return ((bitField0_ & 0x00080000) == 0x00080000);
     }
     /**
-     * <code>required uint64 userId = 20;</code>
+     * <code>required string userId = 20;</code>
      */
-    public long getUserId() {
-      return userId_;
+    public java.lang.String getUserId() {
+      java.lang.Object ref = userId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          userId_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>required string userId = 20;</code>
+     */
+    public com.google.protobuf.ByteString
+        getUserIdBytes() {
+      java.lang.Object ref = userId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        userId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
     }
 
     public static final int ACC_FIELD_NUMBER = 21;
@@ -3535,7 +3647,7 @@ public final class Package {
       imei_ = "";
       softwareVersion_ = "";
       languageApp_ = "";
-      userId_ = 0L;
+      userId_ = "";
       acc_ = 0;
     }
     private byte memoizedIsInitialized = -1;
@@ -3617,7 +3729,7 @@ public final class Package {
         output.writeBytes(19, getLanguageAppBytes());
       }
       if (((bitField0_ & 0x00080000) == 0x00080000)) {
-        output.writeUInt64(20, userId_);
+        output.writeBytes(20, getUserIdBytes());
       }
       if (((bitField0_ & 0x00100000) == 0x00100000)) {
         output.writeUInt32(21, acc_);
@@ -3709,7 +3821,7 @@ public final class Package {
       }
       if (((bitField0_ & 0x00080000) == 0x00080000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt64Size(20, userId_);
+          .computeBytesSize(20, getUserIdBytes());
       }
       if (((bitField0_ & 0x00100000) == 0x00100000)) {
         size += com.google.protobuf.CodedOutputStream
@@ -3870,7 +3982,7 @@ public final class Package {
         bitField0_ = (bitField0_ & ~0x00020000);
         languageApp_ = "";
         bitField0_ = (bitField0_ & ~0x00040000);
-        userId_ = 0L;
+        userId_ = "";
         bitField0_ = (bitField0_ & ~0x00080000);
         acc_ = 0;
         bitField0_ = (bitField0_ & ~0x00100000);
@@ -4094,7 +4206,9 @@ public final class Package {
           onChanged();
         }
         if (other.hasUserId()) {
-          setUserId(other.getUserId());
+          bitField0_ |= 0x00080000;
+          userId_ = other.userId_;
+          onChanged();
         }
         if (other.hasAcc()) {
           setAcc(other.getAcc());
@@ -5490,34 +5604,78 @@ public final class Package {
         return this;
       }
 
-      private long userId_ ;
+      private java.lang.Object userId_ = "";
       /**
-       * <code>required uint64 userId = 20;</code>
+       * <code>required string userId = 20;</code>
        */
       public boolean hasUserId() {
         return ((bitField0_ & 0x00080000) == 0x00080000);
       }
       /**
-       * <code>required uint64 userId = 20;</code>
+       * <code>required string userId = 20;</code>
        */
-      public long getUserId() {
-        return userId_;
+      public java.lang.String getUserId() {
+        java.lang.Object ref = userId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            userId_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
       }
       /**
-       * <code>required uint64 userId = 20;</code>
+       * <code>required string userId = 20;</code>
        */
-      public Builder setUserId(long value) {
-        bitField0_ |= 0x00080000;
+      public com.google.protobuf.ByteString
+          getUserIdBytes() {
+        java.lang.Object ref = userId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          userId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>required string userId = 20;</code>
+       */
+      public Builder setUserId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00080000;
         userId_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>required uint64 userId = 20;</code>
+       * <code>required string userId = 20;</code>
        */
       public Builder clearUserId() {
         bitField0_ = (bitField0_ & ~0x00080000);
-        userId_ = 0L;
+        userId_ = getDefaultInstance().getUserId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required string userId = 20;</code>
+       */
+      public Builder setUserIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00080000;
+        userId_ = value;
         onChanged();
         return this;
       }
@@ -5589,7 +5747,7 @@ public final class Package {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\rpackage.proto\"}\n\005Track\022\016\n\006userId\030\001 \002(\004" +
+      "\n\rpackage.proto\"}\n\005Track\022\016\n\006userId\030\001 \002(\t" +
       "\022\013\n\003acc\030\002 \002(\r\022\017\n\007nameApp\030\003 \002(\t\022\020\n\010device" +
       "IP\030\004 \002(\t\022\034\n\tpageViews\030\005 \003(\0132\t.PageView\022\026" +
       "\n\016typeConnection\030\006 \001(\t\"S\n\010PageView\022\020\n\010ac" +
@@ -5605,7 +5763,7 @@ public final class Package {
       "erAgent\030\016 \001(\t\022\025\n\rlinkPlayStore\030\017 \001(\t\022\024\n\014" +
       "typeCategory\030\020 \001(\t\022\014\n\004imei\030\021 \001(\t\022\027\n\017soft" +
       "wareVersion\030\022 \001(\t\022\023\n\013languageApp\030\023 \001(\t\022\016" +
-      "\n\006userId\030\024 \002(\004\022\013\n\003acc\030\025 \002(\r"
+      "\n\006userId\030\024 \002(\t\022\013\n\003acc\030\025 \002(\r"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

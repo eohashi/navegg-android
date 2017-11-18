@@ -1,0 +1,4 @@
+# Go to the project root dir then execute:
+
+$ protoc package.proto --java_out=$(pwd)/app/src/main/java/navegg/bean/
+$ ex -sc '1i|package navegg.bean;' -cx $(pwd)/app/src/main/java/navegg/bean/Package.java

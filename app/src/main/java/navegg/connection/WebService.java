@@ -1,17 +1,13 @@
 package navegg.connection;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.provider.Settings;
 import android.util.Base64;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -19,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 import navegg.BuildConfig;
-import navegg.base.App;
 import navegg.base.ServerAPI;
 import navegg.bean.OnBoarding;
 import navegg.bean.Package;
@@ -27,97 +22,73 @@ import navegg.bean.PageView;
 import navegg.bean.User;
 import navegg.main.Util;
 import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.Converter;
 import retrofit2.Response;
+import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.protobuf.ProtoConverterFactory;
 
 
-public class SendData {
+public class WebService {
 
     public User user;
-    private int codAccount;
-    private SharedPreferences mSharedPreferences;
-    private SharedPreferences.Editor editor;
     private Context context;
     private Util util;
-    private ServerAPI apiServiceAccount, apiServiceMobile, apiServiceOnBoarding;
-    public List<PageView> trackPageViewList = new ArrayList<>();
-    public List<Integer> customList = new ArrayList<>();
-    public List<OnBoarding> onBoardingList = new ArrayList<>();
+    private static final HashMap ENDPOINTS= new HashMap(){{
+        put("user", "usr");
+        put("request", "cdn");
+        put("onboarding", "cd");
 
-    public SendData(Context context, int codAccount) {
+    }};
 
+
+    public WebService(Context context, User user) {
+        this.user = user;
         this.context = context;
         util = new Util(this.context);
-
-        //apiServiceAccount = App.getClient().create(ServerAPI.class);
-        apiServiceAccount = App.getRetrofit("user", GsonConverterFactory.create(new GsonBuilder().setLenient().create())).create(ServerAPI.class);
-        apiServiceMobile = App.getRetrofit("request",ProtoConverterFactory.create()).create(ServerAPI.class);
-        apiServiceOnBoarding = App.getRetrofit("onboarding", ProtoConverterFactory.create()).create(ServerAPI.class);
-
-        this.codAccount = codAccount;
-
-        this.mSharedPreferences = context.getSharedPreferences("NVGSDK", Context.MODE_PRIVATE);
-        editor = mSharedPreferences.edit();
-
-        getListMobileAndTrack();
-        getListIdCustom();
-        getListOnBoarding();
-
-        Gson gson = new Gson();
-        String json = mSharedPreferences.getString("user", "");
-        this.user = gson.fromJson(json, User.class);
-
     }
 
-    public void getListMobileAndTrack() {
 
-        Gson gsonTrack = new Gson();
-        String json = mSharedPreferences.getString("listAppPageView", "");
-        Type type = new TypeToken<List<PageView>>() {
-        }.getType();
-        trackPageViewList = gsonTrack.fromJson(json, type);
-
+    private static String getEndpoint(String endpoint) {
+        return "http://"+ENDPOINTS.get(endpoint)+".navdmp.com";
     }
 
-    public void getListIdCustom() {
 
-        Gson gsonTrack = new Gson();
-        String json = mSharedPreferences.getString("customList", "");
-        Type type = new TypeToken<List<Integer>>() {
-        }.getType();
-        customList = gsonTrack.fromJson(json, type);
-
-
+    private static Retrofit.Builder getRetrofitBuilder(){
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.addInterceptor(logging);
+        return new Retrofit.Builder().client(httpClient.build());
     }
 
-    public void getListOnBoarding() {
 
-        Gson gsonTrack = new Gson();
-        String json = mSharedPreferences.getString("onBoardingList", "");
-        Type type = new TypeToken<List<OnBoarding>>() {
-        }.getType();
-        onBoardingList = gsonTrack.fromJson(json, type);
+    private static Retrofit getApiService(String endpoint, Converter.Factory fctr){
 
-
+        Retrofit.Builder retrofitBuilder = getRetrofitBuilder();
+        return retrofitBuilder
+                .baseUrl(getEndpoint(endpoint))
+                .addConverterFactory(fctr)
+                .build();
     }
+
+
 
 
     public void trackMobile(String mActivity) {
 
 
-        if (this.user != null) {
-
-            if (!mSharedPreferences.getBoolean("sendDataMobile", true)) {
+        if (!mSharedPreferences.getBoolean("sendDataMobile", true)) {
                 sendDataMobile(util.getDataMobile(this.user));
             }
 
             setListTrackInShared(util.setDataPageView(mActivity));
-            getListMobileAndTrack();
 
             // Sorting
             Collections.sort(trackPageViewList, new Comparator<PageView>() {
@@ -133,9 +104,7 @@ public class SendData {
                 sendDataTrack(trackPageViewList);
             }
 
-        } else {
-            setListTrackInShared(util.setDataPageView(mActivity));
-        }
+
 
     }
 
@@ -202,6 +171,7 @@ public class SendData {
 
         if (util.verifyConnection()) {
 
+            apiServiceAccount = App.getApiService("user", GsonConverterFactory.create(new GsonBuilder().setLenient().create())).create(ServerAPI.class);
             Call<User> call1 = apiServiceAccount.getUser(codAccount, deviceId);
             call1.enqueue(new Callback<User>() {
                 @Override
@@ -266,17 +236,26 @@ public class SendData {
     // envio os dados do track para o WS
     public void sendDataTrack(List<PageView> pageView) {
 
-        Package.Track trackMob = null;
-        trackMob = util.setDataTrack(util.setDataBeanTrack(this.user, pageView), util.setListDataPageView(pageView));
-        trackMob.toBuilder()
+        Package.Track trackMob = util.setDataTrack(this.user, util.setListDataPageView(pageView));
+        /*trackMob.toBuilder()
                 .setAcc(this.user.getAccountId())
-                .setUserId(this.user.getmNvgId()).build();
+                .setUserId(this.user.getUserId()).build();*/
 
         if (util.verifyConnectionWifi()) {
 
             RequestBody body =
-                    RequestBody.create(MediaType.parse("text/track"), Base64.encodeToString(trackMob.toByteArray(), Base64.NO_WRAP));
-            Call<Void> call1 = apiServiceMobile.sendDataTrack(body);
+                    RequestBody.create(
+                            MediaType.parse("text/track"),
+                            Base64.encodeToString(
+                                    trackMob.toByteArray(),
+                                    Base64.NO_WRAP
+                            )
+                    );
+            ServerAPI apiService = this.getApiService(
+                    "request",
+                    ProtoConverterFactory.create()
+            ).create(ServerAPI.class);
+            Call<Void> call1 = apiService.sendDataTrack(body);
 
 
             call1.enqueue(new Callback<Void>() {
@@ -300,27 +279,27 @@ public class SendData {
     }
 
 
-    // envio os dados do track para o WS
+    // envio os dados do track de custom para o WS
     public void sendIdCustom(final List<Integer> listCustom, final int id_custom) {
 
         if (util.verifyConnectionWifi()) {
             Call<Void> call1 = null;
+            ServerAPI apiService = this.getApiService (
+                    "request",
+                    ProtoConverterFactory.create()
+            ).create(ServerAPI.class);
 
-            call1 = apiServiceMobile.sendCustomId(this.user.getAccountId(),id_custom, this.user.getmNvgId());
+            call1 = apiService.sendCustomId(
+                    this.user.getAccountId(),
+                    id_custom,
+                    this.user.getUserId()
+            );
 
             call1.enqueue(new Callback<Void>() {
 
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
-                    listCustom.remove(new Integer(id_custom));
-                    if(listCustom.size() > 0) {
-                        for(int id : listCustom){
-                            sendIdCustom(listCustom, id);
-                            break;
-                         }
-                    }else{
-                        editor.remove("customList").commit();
-                    }
+                    user.removeCustomId(id_custom);
                 }
                 @Override
                 public void onFailure(Call<Void> call, Throwable t) {
@@ -365,7 +344,8 @@ public class SendData {
             Call<Void> call1 = null;
             Map<String,String> params = new HashMap<>();
             params.put(boarding.getMethod(),boarding.getSha1());
-            call1 = apiServiceOnBoarding.setOnBoarding(params, this.user.getmNvgId(), this.user.getAccountId());
+            apiServiceOnBoarding = App.getApiService("onboarding", ProtoConverterFactory.create()).create(ServerAPI.class);
+            call1 = apiServiceOnBoarding.setOnBoarding(params, this.user.getUserId(), this.user.getAccountId());
 
             call1.enqueue(new Callback<Void>() {
                 @Override
@@ -393,52 +373,7 @@ public class SendData {
 
 
 
-    public void setListTrackInShared(PageView pageViewData) {
 
-        if (trackPageViewList == null) {
-            trackPageViewList = new ArrayList<>();
-        }
-
-        trackPageViewList.add(pageViewData);
-
-        Gson gson = new Gson();
-        String json = gson.toJson(trackPageViewList);
-        editor.remove("listAppPageView").commit();
-        editor.putString("listAppPageView", json);
-        editor.commit();
-
-    }
-
-    public void setInListCustom(int id_custom) {
-
-        if (customList == null) {
-            customList = new ArrayList<>();
-        }
-
-        customList.add(id_custom);
-
-        Gson gson = new Gson();
-        String json = gson.toJson(customList);
-        editor.remove("customList").commit();
-        editor.putString("customList", json);
-        editor.commit();
-
-    }
-
-    public void setInListOnBoarding(OnBoarding onBoarding) {
-
-        if (onBoardingList == null) {
-            onBoardingList = new ArrayList<>();
-        }
-
-        onBoardingList.add(onBoarding);
-        Gson gson = new Gson();
-        String json = gson.toJson(onBoardingList);
-        editor.remove("onBoardingList").commit();
-        editor.putString("onBoardingList", json);
-        editor.commit();
-
-    }
 
 }
 

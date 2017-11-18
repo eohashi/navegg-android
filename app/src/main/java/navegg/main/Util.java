@@ -20,8 +20,6 @@ import android.telephony.TelephonyManager;
 import android.text.format.Formatter;
 import android.webkit.WebView;
 
-import com.google.gson.Gson;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -34,10 +32,8 @@ import java.util.List;
 
 import navegg.BuildConfig;
 import navegg.R;
-import navegg.bean.MobileInfo;
 import navegg.bean.Package;
 import navegg.bean.PageView;
-import navegg.bean.Track;
 import navegg.bean.User;
 
 import static android.content.Context.ACTIVITY_SERVICE;
@@ -56,7 +52,6 @@ public class Util {
     String lastActivityName = null;
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor editor;
-    List<Package.PageView> listPackagePageView = new ArrayList<>();
     String[] listSegments = {"gender", "age", "education", "marital", "income", "city", "region", "country", "connection", "brand", "product", "interest", "career", "cluster", "prolook", "custom", "industry", "everybuyer"};
 
     public Util(Context context) {
@@ -120,7 +115,7 @@ public class Util {
         if (util.canGetLocation()) {
             return String.valueOf(util.getLatitude());
         } else {
-            return "SEM GPS";
+            return "No GPS";
         }
     }
 
@@ -128,7 +123,7 @@ public class Util {
         if (util.canGetLocation()) {
             return String.valueOf(util.getLongitude());
         } else {
-            return "SEM GPS";
+            return "No GPS";
         }
     }
 
@@ -175,7 +170,7 @@ public class Util {
                 Manifest.permission.READ_PHONE_STATE)
                 != PackageManager.PERMISSION_GRANTED) {
 
-            return "IMEI Sem permissão";
+            return "IMEI without permission";
 
         } else {
             TelephonyManager mTelephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
@@ -193,7 +188,7 @@ public class Util {
                 Manifest.permission.READ_PHONE_STATE)
                 == PackageManager.PERMISSION_DENIED) {
 
-            return "Software Sem permissão";
+            return "Software without permission";
 
         } else {
             TelephonyManager mTelephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
@@ -350,84 +345,22 @@ public class Util {
                 .setTypeCategory(getTypeCategory())
                 .setImei(getIMEI())
                 .setSoftwareVersion(getSoftwareVersion())
-                .setUserId(user.getmNvgId())
+                .setUserId(user.getUserId())
                 .setAcc(user.getAccountId())
                 .build();
     }
 
-    /*public Package.MobileInfo setDataMobile(MobileInfo mobileInfo) {
 
 
-        Package.MobileInfo mMobileInfo = Package.MobileInfo.newBuilder()
-                .setDeviceId(mobileInfo.getDeviceId())
-                .setPlatform(mobileInfo.getPlatform())
-                .setLongitude(mobileInfo.getLongitude())
-                .setLatitude(mobileInfo.getLatitude())
-                .setAndroidName(mobileInfo.getAndroidName())
-                .setAndroidBrand(mobileInfo.getAndroidBrand())
-                .setAndroidModel(mobileInfo.getAndroidModel())
-                .setVersionRelease(mobileInfo.getVersionRelease())
-                .setManufacturer(mobileInfo.getManufacturer())
-                .setVersionLib(mobileInfo.getVersionLib())
-                .setVersionCode(mobileInfo.getVersionCode())
-                .setVersionOS(mobileInfo.getVersionOS())
-                .setAndroidFingerPrint(mobileInfo.getAndroidFingerPrint())
-                .setUserAgent(mobileInfo.getUserAgent())
-                .setLinkPlayStore(mobileInfo.getLinkPlayStore())
-                .setTypeCategory(mobileInfo.getTypeCategory())
-                .setImei(mobileInfo.getImei())
-                .setSoftwareVersion(mobileInfo.getSoftwareVersion())
-                .setAcc(mobileInfo.getAcc())
-                .setUserId(mobileInfo.getUserId())
-                .build();
-
-        return mMobileInfo;
-
-    }
-
-    public MobileInfo setDataMobileInfo(User user){
-        Gson gson = new Gson();
-        String json = mSharedPreferences.getString("user", "");
-        user = gson.fromJson(json, User.class);
-
-        MobileInfo mobileInfo =
-                new MobileInfo();
-        mobileInfo.setDeviceId(Settings.Secure.getString(context.getContentResolver(),
-                Settings.Secure.ANDROID_ID));
-        mobileInfo.setPlatform("Android");
-        mobileInfo.setLongitude(getLong());
-        mobileInfo.setLatitude(getLat());
-        mobileInfo.setAndroidName(Build.DEVICE);
-        mobileInfo.setAndroidBrand(Build.BRAND);
-        mobileInfo.setAndroidModel(Build.MODEL);
-        mobileInfo.setVersionRelease(Build.VERSION.RELEASE);
-        mobileInfo.setManufacturer(Build.MANUFACTURER);
-        mobileInfo.setVersionLib(BuildConfig.VERSION_NAME);
-        mobileInfo.setVersionCode(BuildConfig.VERSION_CODE);
-        mobileInfo.setVersionOS(Build.VERSION.SDK_INT);
-        mobileInfo.setAndroidFingerPrint(Build.FINGERPRINT);
-        mobileInfo.setUserAgent(new WebView(context).getSettings().getUserAgentString());
-        mobileInfo.setLinkPlayStore(getLinkPlayStore());
-        mobileInfo.setTypeCategory(getTypeCategory());
-        mobileInfo.setImei(getIMEI());
-        mobileInfo.setSoftwareVersion(getSoftwareVersion());
-        mobileInfo.setAcc(user.getAccountId());
-        mobileInfo.setUserId(user.getmNvgId());
-
-
-        return mobileInfo;
-    }*/
-
-
-    public Package.Track setDataTrack(Track track, List<Package.PageView> listPageView) {
+    public Package.Track setDataTrack(User user, List<Package.PageView> listPageView) {
 
 
         Package.Track packageTrack = Package.Track.newBuilder()
-                .setAcc(track.getAcc())
-                .setUserId(track.getUserId())
-                .setNameApp(track.getNameApp())
-                .setDeviceIP(track.getDeviceIP())
-                .setTypeConnection(track.getTypeConnection())
+                .setAcc(user.getAccountId())
+                .setUserId(user.getUserId())
+                .setNameApp(context.getString(R.string.app_name))
+                .setDeviceIP(getMobileIP(context))
+                .setTypeConnection(getTypeConnection())
                 .addAllPageViews(listPageView)
                 .build();
 
@@ -438,24 +371,9 @@ public class Util {
 
 
 
-
-    public Track setDataBeanTrack(User user, List<PageView> pageView){
-
-        Track track = new Track();
-        track.setAcc((user != null) ? user.getAccountId() : 100000000);
-        track.setUserId((user != null) ? user.getmNvgId() : 100000000);
-        track.setNameApp(context.getString(R.string.app_name));
-        track.setDeviceIP(getMobileIP(context));
-        track.setTypeConnection(getTypeConnection());
-        track.setPageViews(pageView);
-
-        return track;
-    }
-
-
     public List<Package.PageView> setListDataPageView(List<PageView> pageView) {
 
-
+        List<Package.PageView> listPackagePageView = new ArrayList<>();
         for(PageView pageViews : pageView) {
 
             Package.PageView packagePageView = Package.PageView.newBuilder()

@@ -9,60 +9,62 @@ import com.google.gson.Gson;
 
 import navegg.bean.OnBoarding;
 import navegg.bean.User;
-import navegg.connection.SendData;
+import navegg.connection.WebService;
 import navegg.main.Util;
 
 public class VerifyStateConnection extends BroadcastReceiver {
     private Util util;
-    private SendData sendData;
-    User user;
+    private WebService webService;
+    private User user;
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor editor;
+
+    VerifyStateConnection(User user){
+        this.user = user;
+    }
+
     @Override
     public void onReceive(Context context, Intent intent) {
 
         util = new Util(context);
-        mSharedPreferences = context.getSharedPreferences("NVGSDK", Context.MODE_PRIVATE);
-        editor = mSharedPreferences.edit();
-        editor.putBoolean("broadCastRunning", true);
-        editor.commit();
+        this.user.setBroadcastRunning(true);
 
 
         Gson gson = new Gson();
         String json = mSharedPreferences.getString("user", "");
         user = gson.fromJson(json, User.class);
-        if(user != null) {
-            sendData = new SendData(context, user.getAccountId());
-            if (util.verifyConnection()) {
-                sendData.getListIdCustom();
-                sendData.getListMobileAndTrack();
-                sendData.getListOnBoarding();
+        if (util.verifyConnection()) {
+            webService = new WebService(context, this.user);
 
-                receiverSendCustom();
-                receiverSendTrackMobile();
-                receiverSendOnBoard();
+            //Send Track
+            if(this.user.getTrackPageViewList() != null)
+                webService.sendDataTrack(this.user.getTrackPageViewList());
+
+            //Send Custom
+            if(this.user.getCustomList() != null) {
+                for (int id_custom : this.user.getCustomList()) {
+                    webService.sendIdCustom(this.user.getCustomList, id_custom);
+                    break;
+                }
             }
         }
+
     }
 
-    private void receiverSendTrackMobile() {
-        if(sendData.trackPageViewList != null)
-            sendData.sendDataTrack(sendData.trackPageViewList);
-    }
 
     private void receiverSendCustom(){
-        if(sendData.customList != null) {
-            for (int id_custom : sendData.customList) {
-                sendData.sendIdCustom(sendData.customList, id_custom);
+        if(webService.customList != null) {
+            for (int id_custom : webService.customList) {
+                webService.sendIdCustom(webService.customList, id_custom);
                 break;
             }
         }
     }
 
     private void receiverSendOnBoard(){
-        if(sendData.onBoardingList != null){
-            for(OnBoarding onBoard : sendData.onBoardingList){
-                sendData.sendOnBoardingMobile(sendData.onBoardingList,onBoard);
+        if(webService.onBoardingList != null){
+            for(OnBoarding onBoard : webService.onBoardingList){
+                webService.sendOnBoardingMobile(webService.onBoardingList,onBoard);
                 break;
             }
         }

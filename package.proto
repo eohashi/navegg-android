@@ -1,0 +1,39 @@
+message Track {
+    required string userId = 1;
+    required uint32 acc = 2;
+    required string nameApp = 3;
+    required string deviceIP = 4;
+    repeated PageView pageViews = 5;
+    optional string typeConnection = 6;
+}
+
+message PageView {
+    required string activity = 1;
+    required uint64 dateTime = 2;
+    required string titlePage = 3;
+    optional string callPage = 4;
+}
+
+message MobileInfo {
+    optional string deviceId = 1;
+    optional string platform = 2;
+    optional string longitude = 3;
+    optional string latitude = 4;
+    optional string androidName = 5;
+    optional string androidBrand = 6;
+    optional string androidModel = 7;
+    optional string versionRelease = 8;
+    optional string manufacturer = 9;
+    optional string versionLib = 10;
+    optional int32 versionCode = 11;
+    optional int32 versionOS = 12;
+    optional string androidFingerPrint = 13;
+    optional string userAgent = 14;
+    optional string linkPlayStore = 15;
+    optional string typeCategory = 16;
+    optional string imei = 17;
+    optional string softwareVersion = 18;
+    optional string languageApp = 19;
+    required string userId = 20;
+    required uint32 acc = 21;
+}
