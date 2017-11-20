@@ -45,16 +45,15 @@ import static android.content.Context.WIFI_SERVICE;
  * Created by william on 23/05/17.
  */
 
-public class Util {
+public class Utils {
 
     private Context context;
     LocationPosition util;
     String lastActivityName = null;
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor editor;
-    String[] listSegments = {"gender", "age", "education", "marital", "income", "city", "region", "country", "connection", "brand", "product", "interest", "career", "cluster", "prolook", "custom", "industry", "everybuyer"};
 
-    public Util(Context context) {
+    public Utils(Context context) {
         this.context = context;
         util = new LocationPosition(context);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
@@ -210,56 +209,26 @@ public class Util {
     /* Pega pagina origem que chamou pagina atual
     * (Somente para activity)*/
     @TargetApi(Build.VERSION_CODES.M)
-    public String getCallPage() {
+    public String getActivityName() {
 
-        lastActivityName = mSharedPreferences.getString("lastActivityName", "");
-        ActivityManager am = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
+
         String activityName = "";
 
+        ActivityManager am = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
         List<ActivityManager.AppTask> tasks = null;
+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             tasks = am.getAppTasks();
 
-
-
             for (ActivityManager.AppTask task : tasks) {
-                if (lastActivityName == "") {
-
-                    editor.putString("lastActivityName", task.getTaskInfo().topActivity.getClassName().toString());
-                    editor.commit();
-
-                    lastActivityName = task.getTaskInfo().topActivity.getClassName().toString();;
-
-                }
                 activityName = task.getTaskInfo().topActivity.getClassName().toString();
             }
-        }else {
-
+        }
+        else {
             List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(2);
-            if (lastActivityName == "") {
-
-                editor.putString("lastActivityName", taskInfo.get(0).topActivity.getClassName());
-                editor.commit();
-
-                lastActivityName = taskInfo.get(0).topActivity.getClassName();
-
-            }
-
             activityName = taskInfo.get(0).topActivity.getClassName();
-
-
         }
-
-
-
-        if (!lastActivityName.equalsIgnoreCase(activityName)) {
-            return lastActivityName;
-        }
-
-        lastActivityName = activityName;
-
-
-        return "";
+        return activityName;
     }
 
     /* Pega pagina origem que chamou pagina atual
@@ -267,7 +236,7 @@ public class Util {
        (Funciona somente para Fragment)
      */
     @SuppressWarnings("RestrictedApi")
-    public Fragment getVisibleFragment() {
+/*    public Fragment getVisibleFragment() {
         String fragClassName = null;
         List<Fragment> fragments = ((FragmentActivity) context).getSupportFragmentManager().getFragments();
         if(fragments == null) return null;
@@ -280,7 +249,7 @@ public class Util {
         return null;
 
 
-    }
+    }*/
 
 
     public boolean verifyConnection() {
@@ -324,31 +293,7 @@ public class Util {
         return connected;
     }
 
-    public Package.MobileInfo getDataMobile(User user) {
 
-        return Package.MobileInfo.newBuilder()
-                .setDeviceId(Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID))
-                .setPlatform("Android")
-                .setLongitude(getLong())
-                .setLatitude(getLat())
-                .setAndroidName(Build.DEVICE)
-                .setAndroidBrand(Build.BRAND)
-                .setAndroidModel(Build.MODEL)
-                .setVersionRelease(Build.VERSION.RELEASE)
-                .setManufacturer(Build.MANUFACTURER)
-                .setVersionLib(BuildConfig.VERSION_NAME)
-                .setVersionCode(BuildConfig.VERSION_CODE)
-                .setVersionOS(Build.VERSION.SDK_INT)
-                .setAndroidFingerPrint(Build.FINGERPRINT)
-                .setUserAgent(new WebView(context).getSettings().getUserAgentString())
-                .setLinkPlayStore(getLinkPlayStore())
-                .setTypeCategory(getTypeCategory())
-                .setImei(getIMEI())
-                .setSoftwareVersion(getSoftwareVersion())
-                .setUserId(user.getUserId())
-                .setAcc(user.getAccountId())
-                .build();
-    }
 
 
 
@@ -388,54 +333,6 @@ public class Util {
         return listPackagePageView;
 
     }
-
-
-    public PageView setDataPageView(String mActivity){
-
-        PageView pageView = new PageView();
-        pageView.setActivity(mActivity);
-        pageView.setDateTime(getCurrentDateTime());
-        pageView.setTitlePage(String.valueOf(((Activity) context).getTitle()));
-        pageView.setCallPage("");
-
-        return pageView;
-    }
-
-
-    public void saveSegments(String segments) {
-        String[] seg = segments.substring(segments.indexOf(" '") + 2, segments.indexOf("');")).split(":",-1);
-        JSONObject json = new JSONObject();
-        for(int i = 0; i < listSegments.length; i++){
-            if(seg[i].length() > 0) {
-                try {
-                    json.put(listSegments[i], seg[i]);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        editor.putString("jsonSegments", json.toString());
-        editor.commit();
-    }
-
-    public String getSegments(String segment){
-
-        String jsonSegments = mSharedPreferences.getString("jsonSegments", "");
-        String idSegment = "";
-        if(jsonSegments != ""){
-            try {
-                JSONObject jsonData = new JSONObject(jsonSegments);
-                idSegment = (String) jsonData.get(segment.toLowerCase().trim());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-
-
-        return idSegment;
-    }
-
 
 
 }

@@ -1,30 +1,29 @@
 package navegg.bean;
 
+import java.util.HashMap;
+
 /**
  * Created by william on 03/11/17.
  */
 
 public class OnBoarding {
 
-    String method;
-    String sha1;
+    private final HashMap data = new HashMap();
 
     public OnBoarding() {
     }
 
-    public String getMethod() {
-        return method;
+    public void addInfo(String key, String value) {
+
+        this.data.put(key,value);
     }
 
-    public void setMethod(String method) {
-        this.method = method;
+    public String getInfo(String key) {
+        return (String) this.data.get(key);
     }
 
-    public String getSha1() {
-        return sha1;
+    public HashMap<String, String> __get_hash_map(){
+        return this.data;
     }
 
-    public void setSha1(String sha1) {
-        this.sha1 = sha1;
-    }
 }

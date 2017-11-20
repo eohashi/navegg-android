@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
-import android.os.Handler;
 
 import com.google.gson.Gson;
 
@@ -16,64 +15,63 @@ public class NaveggAPI {
 
     private Context context;
     private SharedPreferences sharedPreference;
-    private Util util;
+    private Utils utils;
     protected WebService webService;
     private User user;
-    private Handler handler;
 
     public NaveggAPI(Context context, final int accountId) {
         this.user = new User(context, accountId);
 
 
         this.context = context;
-        webService = new WebService(context, this.user);
-        handler = new Handler();
-        setDataDevice();
+        this.webService = new WebService(context, this.user);
+        this.utils = new Utils(context);
+
+        this.user.setLastActivityName(utils.getActivityName());
+
+        if(this.user.getUserId() == null) {
+            this.webService.createUserId();
+        }
+
         this.sharedPreference = context.getSharedPreferences("NVGSDK"+accountId, Context.MODE_PRIVATE);
         boolean broadCast = sharedPreference.getBoolean("broadCastRunning", false);
         if(!broadCast) {
             IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-            context.registerReceiver(new VerifyStateConnection(), intentFilter);
+            context.registerReceiver(new VerifyStateConnection(this.user), intentFilter);
         }
     }
 
-    public void setDataDevice() {
 
-        util = new Util(context);
-
-        util.getCallPage();
-        util.getVisibleFragment();
-
-        Gson gson = new Gson();
-        String json = sharedPreference.getString("user", "");
-        user = gson.fromJson(json, User.class);
-
-        if(user == null) {
-            webService.sendFirstData();
+    public void setTrackPage(String activity){
+        if (!this.user.hasToSendDataMobileInfo()) {
+            this.webService.sendDataMobileInfo(this.user.getDataMobileInfo());
         }
-    }
 
-    public void setTrackPage(String mActivity){
-        webService.trackMobile(mActivity);
+        this.user.makeAPageView(activity);
+        this.webService.sendDataTrack(this.user.getTrackPageViewList());
     }
 
     public void setCustom(int id_custom){
-        webService.setCustomInMobile(id_custom);
+        if (!this.user.hasToSendDataMobileInfo()) {
+            this.webService.sendDataMobileInfo(this.user.getDataMobileInfo());
+        }
+        this.user.setCustom(id_custom);
+        this.webService.sendCustomList(this.user.getCustomList());
     }
 
     public String getSegments(String segment) {
-        return util.getSegments(segment);
+        return this.user.getSegments(segment);
     }
 
-    public long getUserId() {
+    public String getUserId() {
         Gson gson = new Gson();
         String json = sharedPreference.getString("user", "");
         return gson.fromJson(json, User.class).getId();
     }
 
-    public void setOnBoarding(String params, String OnBoarding) {
-        webService.setOnBoardingMobile(params,OnBoarding);
+    public void setOnBoarding(String key, String value) {
+        this.user.setOnBoarding(key, value);
     }
 
 }

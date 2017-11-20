@@ -22,7 +22,7 @@ public interface ServerAPI {
     Call<Void> sendDataTrack(@Body  RequestBody mTrack);
 
     @POST("/sdkinfo")
-    Call<Void> sendDataMobile(@Body RequestBody mMobileInfo);
+    Call<Void> sendDataMobileInfo(@Body RequestBody mMobileInfo);
 
     @POST("/cus")
     Call<Void> sendCustomId(@Query("acc") int acc, @Query("cus") int id_custom, @Query("id") String id_user);
