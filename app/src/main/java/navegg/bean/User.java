@@ -36,10 +36,10 @@ public class User {
     private Context context;
     private Utils utils;
     private SharedPreferences shaPref;
-    private List<PageView> trackPageViewList = new ArrayList<>();
-    private List<Integer> customList = new ArrayList<>();
+    private List<PageView> trackPageViewList;
+    private List<Integer> customList;
     private OnBoarding onBoarding;
-    JSONObject segments;
+    private JSONObject segments;
     private final static String[] listSegments = {
             "gender", "age", "education", "marital",
             "income", "city", "region", "country",
@@ -49,11 +49,13 @@ public class User {
     };
 
 
-    public User(Context context, int accountId) {
+    public User(Context context, Integer accountId) {
         this.context = context;
         this.accountId = accountId;
+        this.utils = new Utils(context);
         this.shaPref = context.getSharedPreferences("NVGSDK"+accountId, Context.MODE_PRIVATE);
         this.userId = this.shaPref.getString("user", null);
+
         this.loadResourcesFromSharedObject();
     }
 
@@ -64,37 +66,44 @@ public class User {
 
         json = this.shaPref.getString("listAppPageView", "");
         this.trackPageViewList = gsonTrack.fromJson(json, new TypeToken<List<PageView>>(){}.getType());
+        if(this.trackPageViewList==null)
+            this.trackPageViewList = new ArrayList<>();
 
         json = this.shaPref.getString("customList", "");
         this.customList = gsonTrack.fromJson(json, new TypeToken<List<Integer>>(){}.getType());
+        if(this.customList==null)
+            this.customList = new ArrayList<>();
 
-        json = this.shaPref.getString("onBoardingList", "");
-        this.onBoarding = gsonTrack.fromJson(json, new TypeToken<List<OnBoarding>>(){}.getType());
+        json = this.shaPref.getString("onBoarding", "");
+        this.onBoarding = gsonTrack.fromJson(json, new TypeToken<OnBoarding>(){}.getType());
+        if(this.onBoarding==null)
+            this.onBoarding = new OnBoarding(this.shaPref);
 
+        this.segments = new JSONObject();
         String jsonSegments = this.shaPref.getString("jsonSegments", "");
-        try {
-            this.segments = new JSONObject(jsonSegments);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
 
+        if(jsonSegments!="")
+            try {
+                this.segments = new JSONObject(jsonSegments);
+            } catch (JSONException e) {
+                //e.printStackTrace();
+            }
     }
 
+    /* User Id */
     public void __set_user_id(String userId) {
         this.shaPref.edit().putString("user", userId).commit();
         this.userId = userId;
     }
-    public String getUserId() { return this.userId; }
+    public String getUserId() {
+        if(this.userId==null)
+            return "0";
+        return this.userId;
+    }
 
     public int getAccountId() {
         return this.accountId;
     }
-
-    public void setAccountId(int accountId) {
-        this.accountId = accountId;
-    }
-
-    public String getId (){ return this.userId;}
 
     public void setBroadcastRunning(Boolean status){
         this.shaPref.edit().putBoolean("broadCastRunning", status).commit();
@@ -108,20 +117,14 @@ public class User {
         this.shaPref.edit().putBoolean("sendDataMobileInfo", status).commit();
     }
 
-    public Boolean getBroadcastRunning(){
-
-        return this.shaPref.getBoolean("broadCastRunning", false);
-    }
-
-
     /* MobileInfo */
     public Package.MobileInfo getDataMobileInfo() {
 
         return Package.MobileInfo.newBuilder()
                 .setDeviceId(Settings.Secure.getString(this.context.getContentResolver(), Settings.Secure.ANDROID_ID))
                 .setPlatform("Android")
-                .setLongitude(utils.getLong())
-                .setLatitude(utils.getLat())
+                .setLongitude(this.utils.getLong())
+                .setLatitude(this.utils.getLat())
                 .setAndroidName(Build.DEVICE)
                 .setAndroidBrand(Build.BRAND)
                 .setAndroidModel(Build.MODEL)
@@ -132,10 +135,10 @@ public class User {
                 .setVersionOS(Build.VERSION.SDK_INT)
                 .setAndroidFingerPrint(Build.FINGERPRINT)
                 .setUserAgent(new WebView(context).getSettings().getUserAgentString())
-                .setLinkPlayStore(utils.getLinkPlayStore())
-                .setTypeCategory(utils.getTypeCategory())
-                .setImei(utils.getIMEI())
-                .setSoftwareVersion(utils.getSoftwareVersion())
+                .setLinkPlayStore(this.utils.getLinkPlayStore())
+                .setTypeCategory(this.utils.getTypeCategory())
+                .setImei(this.utils.getIMEI())
+                .setSoftwareVersion(this.utils.getSoftwareVersion())
                 .setUserId(this.getUserId())
                 .setAcc(this.getAccountId())
                 .build();
@@ -214,20 +217,8 @@ public class User {
     public void setOnBoarding(String key, String value) {
 
         this.onBoarding.addInfo(key, value);
-
-        String json = new Gson().toJson(this.onBoarding);
-        SharedPreferences.Editor editor = this.shaPref.edit();
-        this.shaPref.edit().putString("onBoardingList", json).commit();
-        this.__set_to_send_onBoarding(true);
     }
 
-    public void __set_to_send_onBoarding(Boolean status){
-        this.shaPref.edit().putBoolean("toSendOnBoarding", status).commit();
-    }
-
-    public Boolean hasToSendOnBoarding(){
-        return this.shaPref.getBoolean("toSendOnBoarding", false);
-    }
 
     /* Activity Name */
     public String getLastActivityName(){

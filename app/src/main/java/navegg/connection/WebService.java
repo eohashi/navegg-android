@@ -6,6 +6,9 @@ import android.util.Base64;
 
 import com.google.gson.GsonBuilder;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +37,6 @@ import retrofit2.converter.protobuf.ProtoConverterFactory;
 
 public class WebService {
 
-    public User user;
     private Context context;
     private Utils utils;
     private static final HashMap ENDPOINTS= new HashMap(){{
@@ -45,8 +47,7 @@ public class WebService {
     }};
 
 
-    public WebService(Context context, User user) {
-        this.user = user;
+    public WebService(Context context) {
         this.context = context;
         utils = new Utils(this.context);
     }
@@ -59,7 +60,7 @@ public class WebService {
 
     private static Retrofit.Builder getRetrofitBuilder(){
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        logging.setLevel(HttpLoggingInterceptor.Level.NONE);
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         httpClient.addInterceptor(logging);
         return new Retrofit.Builder().client(httpClient.build());
@@ -77,8 +78,8 @@ public class WebService {
 
 
     // envio os dados do mobile
-    public void sendDataMobileInfo(Package.MobileInfo mobileInfo) {
-
+    public void sendDataMobileInfo(final User user, Package.MobileInfo mobileInfo) {
+        if(user.getUserId()=="0")return;
         if (utils.verifyConnection()) {
             ServerAPI apiService = this.getApiService(
                     "request",
@@ -114,8 +115,8 @@ public class WebService {
     }
 
     // envio os dados do track de custom para o WS
-    public void sendCustomList(final List<Integer> listCustom) {
-
+    public void sendCustomList(final User user, final List<Integer> listCustom) {
+        if(user.getUserId()=="0")return;
         if (utils.verifyConnectionWifi()) {
             Call<Void> call1;
             ServerAPI apiService = this.getApiService(
@@ -124,9 +125,9 @@ public class WebService {
             ).create(ServerAPI.class);
             for (final int id_custom : listCustom) {
                 call1 = apiService.sendCustomId(
-                        this.user.getAccountId(),
+                        user.getAccountId(),
                         id_custom,
-                        this.user.getUserId()
+                        user.getUserId()
                 );
                 call1.enqueue(new Callback<Void>() {
 
@@ -147,7 +148,9 @@ public class WebService {
 
 
     // se caso user for null envio as info para WS
-    public void createUserId() {
+    public void createUserId(final User user) {
+        if(user.getUserId()!="0")return;
+
         String deviceId = Settings.Secure.getString(
                 context.getContentResolver(),
                 Settings.Secure.ANDROID_ID
@@ -161,19 +164,30 @@ public class WebService {
                             new GsonBuilder().setLenient().create()
                     )
             ).create(ServerAPI.class);
-            Call<User> call1 = apiService.getUser(this.user.getAccountId(), deviceId);
-            call1.enqueue(new Callback<User>() {
+            Call<ResponseBody> call1 = apiService.getUser(user.getAccountId(), deviceId);
+            call1.enqueue(new Callback<ResponseBody>() {
                 @Override
-                public void onResponse(Call<User> call, Response<User> responseUser) {
-                    user.setToSendDataMobileInfo(true);
-                    user.__set_user_id(responseUser.body().getUserId());
-                    sendDataMobileInfo(user.getDataMobileInfo());
-                    getSegments();
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    try {
+                        JSONObject jsonResponse = new JSONObject(response.body().string());
+                        user.setToSendDataMobileInfo(true);
+                        user.__set_user_id(jsonResponse.getString("nvgid"));
+                        sendDataMobileInfo(user, user.getDataMobileInfo());
+                        getSegments(user);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    catch (Exception e){
+
+                    }
+
 
                 }
 
                 @Override
-                public void onFailure(Call<User> call, Throwable t) {
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
                     call.cancel();
                 }
             });
@@ -186,9 +200,9 @@ public class WebService {
 
 
     // envio os dados do track para o WS
-    public void sendDataTrack(List<PageView> pageView) {
-
-        Package.Track trackSerialized = utils.setDataTrack(this.user, utils.setListDataPageView(pageView));
+    public void sendDataTrack(final User user, List<PageView> pageView) {
+        if(user.getUserId()=="0") return;
+        Package.Track trackSerialized = utils.setDataTrack(user, utils.setListDataPageView(pageView));
 
         if (utils.verifyConnectionWifi()) {
 
@@ -225,11 +239,9 @@ public class WebService {
 
     }
 
-
-
-
     // retornando os segmentos do WS
-    public void getSegments() {
+    public void getSegments(final User user) {
+        if(user.getUserId()=="0") return;
         if (utils.verifyConnectionWifi()) {
             Call<ResponseBody> call1;
             ServerAPI apiService = this.getApiService(
@@ -239,10 +251,10 @@ public class WebService {
                     )
             ).create(ServerAPI.class);
             call1 = apiService.getSegments(
-                    this.user.getAccountId(),//accountId
+                    user.getAccountId(),//accountId
                     0, //want in String
                     10, // Tag Navegg Version
-                    this.user.getUserId(), // Navegg UserId
+                    user.getUserId(), // Navegg UserId
                     BuildConfig.VERSION_NAME //SDK version
             );
 
@@ -269,7 +281,8 @@ public class WebService {
 
 
     // Onboarding
-    public void sendOnBoarding(final OnBoarding onBoarding) {
+    public void sendOnBoarding(final User user, final OnBoarding onBoarding) {
+        if(user.getUserId()=="0") return;
         if (utils.verifyConnectionWifi()) {
             Call<Void> call1;
             Map<String,String> params = onBoarding.__get_hash_map();
@@ -278,12 +291,12 @@ public class WebService {
                     "onboarding",
                     ProtoConverterFactory.create()
             ).create(ServerAPI.class);
-            call1 = apiService.setOnBoarding(params, this.user.getUserId(), this.user.getAccountId());
+            call1 = apiService.setOnBoarding(params, user.getUserId(), user.getAccountId());
 
             call1.enqueue(new Callback<Void>() {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
-                    user.__set_to_send_onBoarding(false);
+                    user.getOnBoarding().__set_to_send_onBoarding(false);
                 }
 
                 @Override

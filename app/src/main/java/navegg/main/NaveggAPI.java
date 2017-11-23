@@ -5,7 +5,12 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 
+
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.util.Set;
+import java.util.TreeSet;
 
 import navegg.bean.User;
 import navegg.broadcast.VerifyStateConnection;
@@ -20,44 +25,61 @@ public class NaveggAPI {
     private User user;
 
     public NaveggAPI(Context context, final int accountId) {
+
         this.user = new User(context, accountId);
-
-
         this.context = context;
-        this.webService = new WebService(context, this.user);
+        this.webService = new WebService(context);
         this.utils = new Utils(context);
 
         this.user.setLastActivityName(utils.getActivityName());
 
-        if(this.user.getUserId() == null) {
-            this.webService.createUserId();
+
+        if(this.user.getUserId() == "0") {
+            this.webService.createUserId(this.user);
         }
 
         this.sharedPreference = context.getSharedPreferences("NVGSDK"+accountId, Context.MODE_PRIVATE);
-        boolean broadCast = sharedPreference.getBoolean("broadCastRunning", false);
+        this.registerReceiverAndAccountSdk(accountId);
+    }
+
+    private void registerReceiverAndAccountSdk(Integer accountId){
+        SharedPreferences shaPref = context.getSharedPreferences("NVGSDKS", Context.MODE_PRIVATE);
+        boolean broadCast = shaPref.getBoolean("broadCastRunning", false);
         if(!broadCast) {
+            shaPref.edit().putBoolean("broadCastRunning", true).commit();
             IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-            context.registerReceiver(new VerifyStateConnection(this.user), intentFilter);
+            context.registerReceiver(new VerifyStateConnection(), intentFilter);
+        }
+        Gson gson = new Gson();
+        String json = shaPref.getString("accounts","");
+        Set<Integer> accounts = gson.fromJson(json, new TypeToken<TreeSet<Integer>>(){}.getType());
+
+        if(accounts==null)
+            accounts = new TreeSet<>();
+        if(!accounts.contains(accountId)){
+            accounts.add(accountId);
+            json = gson.toJson(accounts);
+            shaPref.edit().putString("accounts", json).commit();
         }
     }
 
 
     public void setTrackPage(String activity){
-        if (!this.user.hasToSendDataMobileInfo()) {
-            this.webService.sendDataMobileInfo(this.user.getDataMobileInfo());
+        if (this.user.hasToSendDataMobileInfo()) {
+            this.webService.sendDataMobileInfo(this.user, this.user.getDataMobileInfo());
         }
 
         this.user.makeAPageView(activity);
-        this.webService.sendDataTrack(this.user.getTrackPageViewList());
+        this.webService.sendDataTrack(this.user, this.user.getTrackPageViewList());
     }
 
     public void setCustom(int id_custom){
         if (!this.user.hasToSendDataMobileInfo()) {
-            this.webService.sendDataMobileInfo(this.user.getDataMobileInfo());
+            this.webService.sendDataMobileInfo(this.user, this.user.getDataMobileInfo());
         }
         this.user.setCustom(id_custom);
-        this.webService.sendCustomList(this.user.getCustomList());
+        this.webService.sendCustomList(this.user, this.user.getCustomList());
     }
 
     public String getSegments(String segment) {
@@ -65,13 +87,17 @@ public class NaveggAPI {
     }
 
     public String getUserId() {
-        Gson gson = new Gson();
-        String json = sharedPreference.getString("user", "");
-        return gson.fromJson(json, User.class).getId();
+        return this.user.getUserId();
     }
 
     public void setOnBoarding(String key, String value) {
         this.user.setOnBoarding(key, value);
+        this.webService.sendOnBoarding(this.user, this.user.getOnBoarding());
+    }
+
+    public String getOnBoarding(String key) {
+        return this.user.getOnBoarding().getInfo(key);
+
     }
 
 }

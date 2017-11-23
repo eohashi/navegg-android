@@ -16,7 +16,7 @@ import retrofit2.http.QueryMap;
 public interface ServerAPI {
 
     @GET("/usr")
-    Call<User> getUser(@Query("acc") int acc, @Query("devid") String mDeviceId);
+    Call<ResponseBody> getUser(@Query("acc") int acc, @Query("devid") String mDeviceId);
 
     @POST("/sdkreq")
     Call<Void> sendDataTrack(@Body  RequestBody mTrack);
