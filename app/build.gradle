@@ -19,10 +19,11 @@ android {
     }
 }
 
-uploadArchives {
+//USED TO DEBUG LOCAL
+/*uploadArchives {
     repositories {
         mavenDeployer {
-            repository(url: "file:///home/salvachz/Projects/appBuilder")
+            repository(url: "file:///home/william/LibNavegg")
 
             pom.groupId = GROUP
             pom.artifactId = POM_ARTIFACT_ID
@@ -31,8 +32,8 @@ uploadArchives {
     }
 }
 
-/* USED TO DEVELOPER */
-task install(dependsOn: uploadArchives)
+*//* USED TO DEVELOPER *//*
+task install(dependsOn: uploadArchives)*/
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -50,6 +51,8 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
-/* USED TO DEPLOY */
+/* USED TO DEPLOY*/
+/*
 //apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
 //task install(dependsOn: uploadArchives)
+*/

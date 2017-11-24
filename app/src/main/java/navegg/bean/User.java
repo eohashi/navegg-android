@@ -79,15 +79,7 @@ public class User {
         if(this.onBoarding==null)
             this.onBoarding = new OnBoarding(this.shaPref);
 
-        this.segments = new JSONObject();
-        String jsonSegments = this.shaPref.getString("jsonSegments", "");
 
-        if(jsonSegments!="")
-            try {
-                this.segments = new JSONObject(jsonSegments);
-            } catch (JSONException e) {
-                //e.printStackTrace();
-            }
     }
 
     /* User Id */
@@ -243,19 +235,24 @@ public class User {
                 }
             }
         }
-
         this.shaPref.edit().putString("jsonSegments", json.toString()).commit();
     }
 
     public String getSegments(String segment){
 
-
         String idSegment = "";
-        try {
-            idSegment = (String) this.segments.get(segment.toLowerCase().trim());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        this.segments = new JSONObject();
+        String jsonSegments = this.shaPref.getString("jsonSegments", "");
+
+        if(jsonSegments!="")
+            try {
+                this.segments = new JSONObject(jsonSegments);
+                idSegment = (String) this.segments.get(segment.toLowerCase().trim());
+            } catch (JSONException e) {
+                //e.printStackTrace();
+            }
+
+
 
         return idSegment;
     }
