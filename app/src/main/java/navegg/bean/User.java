@@ -201,13 +201,11 @@ public class User {
     }
 
     /* OnBoarding */
-
     public OnBoarding getOnBoarding() {
         return this.onBoarding;
     }
 
     public void setOnBoarding(String key, String value) {
-
         this.onBoarding.addInfo(key, value);
     }
 
@@ -238,7 +236,7 @@ public class User {
         this.shaPref.edit().putString("jsonSegments", json.toString()).commit();
     }
 
-    public String getSegments(String segment){
+    public String  getSegments(String segment){
 
         String idSegment = "";
         this.segments = new JSONObject();

@@ -51,6 +51,7 @@ public class NaveggAPI {
             intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
             context.registerReceiver(new VerifyStateConnection(), intentFilter);
         }
+
         Gson gson = new Gson();
         String json = shaPref.getString("accounts","");
         Set<Integer> accounts = gson.fromJson(json, new TypeToken<TreeSet<Integer>>(){}.getType());
@@ -97,7 +98,6 @@ public class NaveggAPI {
 
     public String getOnBoarding(String key) {
         return this.user.getOnBoarding().getInfo(key);
-
     }
 
 }

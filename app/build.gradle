@@ -20,10 +20,11 @@ android {
 }
 
 //USED TO DEBUG LOCAL
-/*uploadArchives {
+uploadArchives {
     repositories {
         mavenDeployer {
-            repository(url: "file:///home/william/LibNavegg")
+            // mudar esse reposotório para gerar o AAR
+            repository(url: "file:///webdocs/LibNavegg")
 
             pom.groupId = GROUP
             pom.artifactId = POM_ARTIFACT_ID
@@ -32,8 +33,8 @@ android {
     }
 }
 
-*//* USED TO DEVELOPER *//*
-task install(dependsOn: uploadArchives)*/
+/* USED TO DEVELOPER */
+task install(dependsOn: uploadArchives)
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -50,6 +51,20 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
 }
+
+
+task deleteJar(type: Delete) {
+    delete 'libs/logmanagementlib.jar'
+}
+
+task createJar(type: Copy) {
+    from('build/intermediates/bundles/release/')
+    into('libs/jars/')
+    include('classes.jar')
+    rename('classes.jar', 'libsdk.jar')
+}
+
+createJar.dependsOn(deleteJar, build)
 
 /* USED TO DEPLOY*/
 /*
