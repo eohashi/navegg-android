@@ -53,18 +53,18 @@ dependencies {
 }
 
 
-task deleteJar(type: Delete) {
-    delete 'libs/logmanagementlib.jar'
-}
+//task deleteJar(type: Delete) {
+//    delete 'libs/libsdk.jar'
+//}
+//
+//task createJar(type: Copy) {
+//    from('build/intermediates/bundles/release/')
+//    into('libs/jars/')
+//    include('classes.jar')
+//    rename('classes.jar', 'libsdk.jar')
+//}
 
-task createJar(type: Copy) {
-    from('build/intermediates/bundles/release/')
-    into('libs/jars/')
-    include('classes.jar')
-    rename('classes.jar', 'libsdk.jar')
-}
-
-createJar.dependsOn(deleteJar, build)
+//createJar.dependsOn(deleteJar, build)
 
 /* USED TO DEPLOY*/
 /*

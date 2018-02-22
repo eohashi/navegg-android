@@ -1,6 +1,7 @@
 package navegg.connection;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.provider.Settings;
 import android.util.Base64;
 
@@ -10,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -234,9 +236,7 @@ public class WebService {
                     call.cancel();
                 }
             });
-
         }
-
     }
 
     // retornando os segmentos do WS
@@ -263,7 +263,7 @@ public class WebService {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                     try {
-                       user.saveSegments(response.body().string());
+                        user.saveSegments(response.body().string());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -306,7 +306,6 @@ public class WebService {
                 }
             });
         }
-
     }
 
 

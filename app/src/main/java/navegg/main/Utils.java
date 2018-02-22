@@ -26,7 +26,11 @@ import org.json.JSONObject;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -334,5 +338,20 @@ public class Utils {
 
     }
 
+
+    public String dateToString(Date date){
+        return new SimpleDateFormat("yyyy-MM-dd").format(date);
+    }
+
+    public Date stringToDate(String date){
+        Date dateFormated = null;
+        try {
+            dateFormated = new SimpleDateFormat("yyyy-MM-dd").parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return dateFormated;
+    }
 
 }

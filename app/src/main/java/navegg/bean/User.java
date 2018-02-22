@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.provider.Settings;
+import android.support.v4.BuildConfig;
 import android.webkit.WebView;
 
 import com.google.gson.Gson;
@@ -14,12 +15,17 @@ import com.google.gson.reflect.TypeToken;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.logging.SimpleFormatter;
 
-import navegg.BuildConfig;
+import navegg.connection.WebService;
 import navegg.main.Utils;
 
 
@@ -40,6 +46,7 @@ public class User {
     private List<Integer> customList;
     private OnBoarding onBoarding;
     private JSONObject segments;
+    private WebService ws;
     private final static String[] listSegments = {
             "gender", "age", "education", "marital",
             "income", "city", "region", "country",
@@ -55,7 +62,7 @@ public class User {
         this.utils = new Utils(context);
         this.shaPref = context.getSharedPreferences("NVGSDK"+accountId, Context.MODE_PRIVATE);
         this.userId = this.shaPref.getString("user", null);
-
+        this.ws = new WebService(this.context);
         this.loadResourcesFromSharedObject();
     }
 
@@ -234,6 +241,8 @@ public class User {
             }
         }
         this.shaPref.edit().putString("jsonSegments", json.toString()).commit();
+        System.out.println("DATE ACTUAL "+ new Date(Calendar.getInstance().getTime().getTime()));
+        this.shaPref.edit().putLong("dateLastSync",Calendar.getInstance().getTime().getTime()).commit();
     }
 
     public String  getSegments(String segment){
@@ -241,6 +250,29 @@ public class User {
         String idSegment = "";
         this.segments = new JSONObject();
         String jsonSegments = this.shaPref.getString("jsonSegments", "");
+        long dateLastSync = this.shaPref.getLong("dateLastSync", 0);
+
+        if(dateLastSync != 0){
+
+            Date dateSync = new Date(dateLastSync);
+            Date currentDate = Calendar.getInstance().getTime();
+
+            System.out.println("Date Actual "+currentDate.toString());
+
+            try {
+                dateSync = new SimpleDateFormat("yyyy-MM-dd").parse(utils.dateToString(dateSync));
+                currentDate = new SimpleDateFormat("yyyy-MM-dd").parse(utils.dateToString(currentDate));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+
+            System.out.println("DATE ACTUAL "+ currentDate.toString());
+            if(currentDate.after(dateSync)){
+                System.out.println("ENTROU NO IF");
+                this.ws.getSegments(this);
+            }
+        }
 
         if(jsonSegments!="")
             try {
