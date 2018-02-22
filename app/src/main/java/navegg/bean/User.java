@@ -241,7 +241,6 @@ public class User {
             }
         }
         this.shaPref.edit().putString("jsonSegments", json.toString()).commit();
-        System.out.println("DATE ACTUAL "+ new Date(Calendar.getInstance().getTime().getTime()));
         this.shaPref.edit().putLong("dateLastSync",Calendar.getInstance().getTime().getTime()).commit();
     }
 
@@ -257,8 +256,6 @@ public class User {
             Date dateSync = new Date(dateLastSync);
             Date currentDate = Calendar.getInstance().getTime();
 
-            System.out.println("Date Actual "+currentDate.toString());
-
             try {
                 dateSync = new SimpleDateFormat("yyyy-MM-dd").parse(utils.dateToString(dateSync));
                 currentDate = new SimpleDateFormat("yyyy-MM-dd").parse(utils.dateToString(currentDate));
@@ -266,10 +263,7 @@ public class User {
                 e.printStackTrace();
             }
 
-
-            System.out.println("DATE ACTUAL "+ currentDate.toString());
             if(currentDate.after(dateSync)){
-                System.out.println("ENTROU NO IF");
                 this.ws.getSegments(this);
             }
         }
