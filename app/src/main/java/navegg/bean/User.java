@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.SimpleFormatter;
 
 import navegg.connection.WebService;
 import navegg.main.Utils;
@@ -54,6 +53,8 @@ public class User {
             "interest", "career", "cluster",
             "", "custom", "industry", "everybuyer" //empty one was prolook
     };
+    private List<Integer> listCustomPermanent = new ArrayList<>();
+    private String jsonSegments;
 
 
     public User(Context context, Integer accountId) {
@@ -85,6 +86,15 @@ public class User {
         this.onBoarding = gsonTrack.fromJson(json, new TypeToken<OnBoarding>(){}.getType());
         if(this.onBoarding==null)
             this.onBoarding = new OnBoarding(this.shaPref);
+
+
+        json = this.shaPref.getString("customListAux", "");
+        this.listCustomPermanent = gsonTrack.fromJson(json, new TypeToken<List<Integer>>(){}.getType());
+        System.out.println("LISTAUX "+ this.listCustomPermanent);
+        if(this.listCustomPermanent==null)
+            this.listCustomPermanent = new ArrayList<>();
+
+
 
 
     }
@@ -189,8 +199,21 @@ public class User {
     public void setCustom(int id_custom) {
         this.customList.add(id_custom);
 
+        setPermanentCustom(id_custom);
+
+
         String json  = new Gson().toJson(this.customList);
         this.shaPref.edit().putString("customList", json).commit();
+    }
+
+    private void setPermanentCustom(int id_custom) {
+
+        if(!listCustomPermanent.contains(id_custom)) {
+            listCustomPermanent.add(id_custom);
+            String json = new Gson().toJson(this.listCustomPermanent);
+            this.shaPref.edit().putString("customListAux", json).commit();
+        }
+
     }
 
     public List<Integer> getCustomList() {
@@ -248,8 +271,10 @@ public class User {
 
         String idSegment = "";
         this.segments = new JSONObject();
-        String jsonSegments = this.shaPref.getString("jsonSegments", "");
+        jsonSegments = this.shaPref.getString("jsonSegments", "");
         long dateLastSync = this.shaPref.getLong("dateLastSync", 0);
+
+
 
         if(dateLastSync != 0){
 
@@ -271,9 +296,10 @@ public class User {
         if(jsonSegments!="")
             try {
                 this.segments = new JSONObject(jsonSegments);
+                setDistinticSegments();
                 idSegment = (String) this.segments.get(segment.toLowerCase().trim());
             } catch (JSONException e) {
-                //e.printStackTrace();
+                e.printStackTrace();
             }
 
 
@@ -281,6 +307,35 @@ public class User {
         return idSegment;
     }
 
+    private void setDistinticSegments() {
+        String segment = "";
+        try {
+                if (this.segments.has("custom")) {
+                    segment = (String) this.segments.getString("custom");
+
+                    for (int custom = 0; custom < this.listCustomPermanent.size(); custom++) {
+                        if (!segment.equals("")) {
+                            this.segments.put("custom", "-" + this.listCustomPermanent.get(custom).toString());
+                        } else {
+                            this.segments.put("custom", "" + this.listCustomPermanent.get(custom).toString());
+                        }
+                    }
+                }else{
+                    for (int custom = 0; custom < this.listCustomPermanent.size(); custom++) {
+                        if (!segment.equals("")) {
+                            this.segments.put("custom", "-" + this.listCustomPermanent.get(custom).toString());
+                        } else {
+                            this.segments.put("custom", "" + this.listCustomPermanent.get(custom).toString());
+                        }
+
+                    }
+                }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+    }
 
 
 }
