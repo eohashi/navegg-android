@@ -11,8 +11,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +46,10 @@ public class WebService {
 
     private Context context;
     private Utils utils;
+    private JSONObject jsonObject = new JSONObject();
+
+    private static List<String> defineParams = new ArrayList<String>(Arrays.asList("prtusride","prtusridc","prtusridr","prtusridf", "prtusridt"));
+
     private static final HashMap ENDPOINTS= new HashMap(){{
         put("user", "usr");
         put("request", "cdn");
@@ -62,7 +71,7 @@ public class WebService {
 
     private static Retrofit.Builder getRetrofitBuilder(){
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        logging.setLevel(HttpLoggingInterceptor.Level.NONE);
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         httpClient.addInterceptor(logging);
         return new Retrofit.Builder().client(httpClient.build());
@@ -283,9 +292,31 @@ public class WebService {
     // Onboarding
     public void sendOnBoarding(final User user, final OnBoarding onBoarding) {
         if(user.getUserId()=="0") return;
+        http://cd.navdmp.com/cd?OTO=124355655&DATA=123&data={%22OTO%22:%22124355655%22,%22prtusride%22:%22456456456546456%22,%22DATA%22:%22123%22,%22data%22:%22{\%22OTO\%22:\%22124355655\%22,\%22DATA\%22:\%22123\%22,\%22data\%22:\%22{\\\%22DATA\\\%22:\\\%22123\\\%22}\%22}%22}&id=884910e060c0dec9f6d8c2c6609&prtid=666 (287ms)
+
         if (utils.verifyConnectionWifi()) {
             Call<Void> call1;
             Map<String,String> params = onBoarding.__get_hash_map();
+            for(String par : params.keySet()){
+                if(!defineParams.contains(par) && !par.equalsIgnoreCase("DATA")){
+                    try {
+                        jsonObject.put(par, params.get(par));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            for (Iterator<String> it = jsonObject.keys(); it.hasNext(); ) {
+                String defParams = it.next();
+                if(params.containsKey(defParams) && (defParams != "DATA")){
+                    params.remove(defParams);
+                }
+            }
+
+            if(jsonObject.length() > 0)
+                params.put("DATA", jsonObject.toString());
+
 
             ServerAPI apiService = this.getApiService(
                     "onboarding",
