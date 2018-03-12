@@ -50,8 +50,8 @@ public class User {
             "gender", "age", "education", "marital",
             "income", "city", "region", "country",
             "connection", "brand", "product",
-            "interest", "career", "cluster",
-            "", "custom", "industry", "everybuyer" //empty one was prolook
+            "interest", "career", "custom",
+            "everybuyer", "everyone"
     };
     private List<Integer> listCustomPermanent = new ArrayList<>();
     private String jsonSegments;
