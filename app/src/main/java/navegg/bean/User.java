@@ -95,8 +95,6 @@ public class User {
             this.listCustomPermanent = new ArrayList<>();
 
 
-
-
     }
 
     /* User Id */
@@ -104,6 +102,7 @@ public class User {
         this.shaPref.edit().putString("user", userId).commit();
         this.userId = userId;
     }
+
     public String getUserId() {
         if(this.userId==null)
             return "0";

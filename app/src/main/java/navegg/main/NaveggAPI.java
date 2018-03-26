@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
+import android.support.multidex.MultiDex;
+import android.support.multidex.MultiDexApplication;
 
 
 import com.google.gson.Gson;
@@ -16,7 +18,7 @@ import navegg.bean.User;
 import navegg.broadcast.VerifyStateConnection;
 import navegg.connection.WebService;
 
-public class NaveggAPI {
+public class NaveggAPI extends MultiDexApplication {
 
     private Context context;
     private SharedPreferences sharedPreference;
@@ -100,4 +102,11 @@ public class NaveggAPI {
         return this.user.getOnBoarding().getInfo(key);
     }
 
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(context);
+    }
 }
+

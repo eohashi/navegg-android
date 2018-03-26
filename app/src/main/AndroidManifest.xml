@@ -12,11 +12,13 @@
 
 
 
-    <application>
+    <application
+        android:name="android.support.multidex.MultiDexApplication"
+        >
 
         <receiver android:name=".broadcast.VerifyStateConnection" >
             <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"></action>/>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"></action>
             </intent-filter>
         </receiver>
     </application>

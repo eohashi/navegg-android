@@ -221,7 +221,7 @@ public class Utils {
         ActivityManager am = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
         List<ActivityManager.AppTask> tasks = null;
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+        if (android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.LOLLIPOP) {
             tasks = am.getAppTasks();
 
             for (ActivityManager.AppTask task : tasks) {
@@ -232,6 +232,7 @@ public class Utils {
             List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(2);
             activityName = taskInfo.get(0).topActivity.getClassName();
         }
+
         return activityName;
     }
 
