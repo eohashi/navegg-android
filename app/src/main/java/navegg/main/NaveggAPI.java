@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
+import android.util.Log;
 
 
 import com.google.gson.Gson;
@@ -32,11 +33,12 @@ public class NaveggAPI extends MultiDexApplication {
         this.context = context;
         this.webService = new WebService(context);
         this.utils = new Utils(context);
+        Log.d("navegg","run 12");
 
         this.user.setLastActivityName(utils.getActivityName());
 
 
-        if(this.user.getUserId() == "0") {
+        if(this.user.getUserId().equals("0")) {
             this.webService.createUserId(this.user);
         }
 
@@ -51,7 +53,9 @@ public class NaveggAPI extends MultiDexApplication {
             shaPref.edit().putBoolean("broadCastRunning", true).commit();
             IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+            VerifyStateConnection verifySC = new VerifyStateConnection();
             context.registerReceiver(new VerifyStateConnection(), intentFilter);
+
         }
 
         Gson gson = new Gson();

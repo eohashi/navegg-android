@@ -225,7 +225,7 @@ public class Utils {
             tasks = am.getAppTasks();
 
             for (ActivityManager.AppTask task : tasks) {
-                activityName = task.getTaskInfo().topActivity.getClassName().toString();
+                activityName = task.getTaskInfo().topActivity.getClassName();
             }
         }
         else {
@@ -240,8 +240,8 @@ public class Utils {
         Ainda em Teste
        (Funciona somente para Fragment)
      */
-    @SuppressWarnings("RestrictedApi")
-/*    public Fragment getVisibleFragment() {
+/*    @SuppressWarnings("RestrictedApi")
+    public Fragment getVisibleFragment() {
         String fragClassName = null;
         List<Fragment> fragments = ((FragmentActivity) context).getSupportFragmentManager().getFragments();
         if(fragments == null) return null;

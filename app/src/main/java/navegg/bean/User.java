@@ -3,11 +3,16 @@ package navegg.bean;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.provider.Settings;
 import android.support.v4.BuildConfig;
+import android.util.Log;
 import android.webkit.WebView;
 
+import com.google.android.gms.ads.identifier.AdvertisingIdClient;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
@@ -15,6 +20,7 @@ import com.google.gson.reflect.TypeToken;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,6 +44,7 @@ public class User {
     private String userId;
     @SerializedName("accountId")
     private int accountId;
+    private String advertId;
     private Context context;
     private Utils utils;
     private SharedPreferences shaPref;
@@ -56,7 +63,6 @@ public class User {
     private List<Integer> listCustomPermanent = new ArrayList<>();
     private String jsonSegments;
 
-
     public User(Context context, Integer accountId) {
         this.context = context;
         this.accountId = accountId;
@@ -64,7 +70,40 @@ public class User {
         this.shaPref = context.getSharedPreferences("NVGSDK"+accountId, Context.MODE_PRIVATE);
         this.userId = this.shaPref.getString("user", null);
         this.ws = new WebService(this.context);
+        this.loadAdvertId(this.context);
         this.loadResourcesFromSharedObject();
+    }
+
+    public String getAdvertId(){
+        return this.advertId;
+    }
+    private void loadAdvertId(final Context context) {
+
+        Log.d("navegg","buscando o getAdvertId");
+        if(this.advertId!=null) return;
+
+        Log.d("navegg","buscando no sharedPref");
+        this.advertId = this.shaPref.getString("advertId", null);
+        if(this.advertId!=null) return;
+
+        Log.d("navegg","vai bsucar advertId na thread");
+        final User thisUser = this;
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Log.d("navegg","dentro da thread...");
+                    AdvertisingIdClient.Info adInfo = AdvertisingIdClient.getAdvertisingIdInfo(context);
+                    thisUser.advertId = adInfo != null ? adInfo.getId() : null;
+                    if(thisUser.advertId!=null)
+                        thisUser.shaPref.edit().putString("advertId", thisUser.advertId).apply();
+                    Log.d("navegg","e pegou o valor: "+thisUser.getAdvertId());
+                    // Use the advertising id
+                } catch (IOException | GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException exception) {
+                    // Error handling if needed
+                }
+            }
+        });
     }
 
     private void loadResourcesFromSharedObject(){
@@ -129,7 +168,7 @@ public class User {
     public Package.MobileInfo getDataMobileInfo() {
 
         return Package.MobileInfo.newBuilder()
-                .setDeviceId(Settings.Secure.getString(this.context.getContentResolver(), Settings.Secure.ANDROID_ID))
+                .setDeviceId(this.getAdvertId())
                 .setPlatform("Android")
                 .setLongitude(this.utils.getLong())
                 .setLatitude(this.utils.getLat())
@@ -184,7 +223,7 @@ public class User {
     }
 
     public void cleanPageViewList() {
-        this.shaPref.edit().remove("listAppPageView").commit();
+        this.shaPref.edit().remove("listAppPageView").apply();
         this.trackPageViewList.clear();
     }
 
@@ -220,7 +259,7 @@ public class User {
     }
 
     public void removeCustomId(int id_custom){
-        this.customList.remove(new Integer(id_custom));
+        this.customList.remove(Integer.valueOf(id_custom));
         if(this.customList.size() > 0) {
             String json  = new Gson().toJson(this.customList);
             this.shaPref.edit().putString("customList", json).commit();
@@ -245,25 +284,22 @@ public class User {
     }
 
     public void setLastActivityName(String activityName){
-        this.shaPref.edit().putString("lastActivityName",activityName);
+        this.shaPref.edit().putString("lastActivityName",activityName).apply();
     }
 
 
     /* Segments */
     public void saveSegments(String segments) {
-        String[] seg = segments.substring(segments.indexOf(" '") + 2, segments.indexOf("');")).split(":",-1);
-        JSONObject json = new JSONObject();
-        for(int i = 0; i < listSegments.length; i++){
-            if(seg[i].length() > 0) {
-                try {
-                    json.put(listSegments[i], seg[i]);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
+        Log.d("navegg","e os segmentos vieram: "+segments);
+        try {
+            JSONObject json = new JSONObject();
+            this.shaPref.edit().putString("jsonSegments", json.toString()).apply();
+            this.shaPref.edit().putLong("dateLastSync", Calendar.getInstance().getTime().getTime()).apply();
+        } catch (Exception e) {
+            //e.printStackTrace();
         }
-        this.shaPref.edit().putString("jsonSegments", json.toString()).commit();
-        this.shaPref.edit().putLong("dateLastSync",Calendar.getInstance().getTime().getTime()).commit();
+
+
     }
 
     public String  getSegments(String segment){
@@ -292,7 +328,7 @@ public class User {
             }
         }
 
-        if(jsonSegments!="")
+        if(jsonSegments!=null && !jsonSegments.equals(""))
             try {
                 this.segments = new JSONObject(jsonSegments);
                 setDistinticSegments();

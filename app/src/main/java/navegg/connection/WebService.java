@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.provider.Settings;
 import android.util.Base64;
+import android.util.Log;
 
 import com.google.gson.GsonBuilder;
 
@@ -65,7 +66,8 @@ public class WebService {
 
 
     private static String getEndpoint(String endpoint) {
-        return "http://"+ENDPOINTS.get(endpoint)+".navdmp.com";
+        return "http://local.navdmp.com";
+        //return "http://"+ENDPOINTS.get(endpoint)+".navdmp.com";
     }
 
 
@@ -160,14 +162,13 @@ public class WebService {
 
     // se caso user for null envio as info para WS
     public void createUserId(final User user) {
-        if(user.getUserId()!="0")return;
+        String userId = user.getUserId();
+        if(userId!=null && !userId.equals("0"))
+            return;
 
-        String deviceId = Settings.Secure.getString(
-                context.getContentResolver(),
-                Settings.Secure.ANDROID_ID
-        );
+        String advertId = user.getAdvertId();
 
-        if (utils.verifyConnection()) {
+        if (utils.verifyConnection() && advertId!=null) {
 
             ServerAPI apiService = this.getApiService(
                     "user",
@@ -175,12 +176,15 @@ public class WebService {
                             new GsonBuilder().setLenient().create()
                     )
             ).create(ServerAPI.class);
-            Call<ResponseBody> call1 = apiService.getUser(user.getAccountId(), deviceId);
+            Call<ResponseBody> call1 = apiService.getUser(user.getAccountId(), advertId);
             call1.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                     try {
-                        JSONObject jsonResponse = new JSONObject(response.body().string());
+                        String response_body = response.body().string();
+                        Log.d("navegg","valor:"+response_body);
+                        JSONObject jsonResponse = new JSONObject(response_body);
+                        Log.d("navegg","string is"+jsonResponse.getString("nvgid"));
                         user.setToSendDataMobileInfo(true);
                         user.__set_user_id(jsonResponse.getString("nvgid"));
                         sendDataMobileInfo(user, user.getDataMobileInfo());
@@ -262,7 +266,7 @@ public class WebService {
             call1 = apiService.getSegments(
                     user.getAccountId(),//accountId
                     0, //want in String
-                    10, // Tag Navegg Version
+                    11, // Tag Navegg Version
                     user.getUserId(), // Navegg UserId
                     BuildConfig.VERSION_NAME //SDK version
             );
@@ -292,7 +296,6 @@ public class WebService {
     // Onboarding
     public void sendOnBoarding(final User user, final OnBoarding onBoarding) {
         if(user.getUserId()=="0") return;
-        http://cd.navdmp.com/cd?OTO=124355655&DATA=123&data={%22OTO%22:%22124355655%22,%22prtusride%22:%22456456456546456%22,%22DATA%22:%22123%22,%22data%22:%22{\%22OTO\%22:\%22124355655\%22,\%22DATA\%22:\%22123\%22,\%22data\%22:\%22{\\\%22DATA\\\%22:\\\%22123\\\%22}\%22}%22}&id=884910e060c0dec9f6d8c2c6609&prtid=666 (287ms)
 
         if (utils.verifyConnectionWifi()) {
             Call<Void> call1;
