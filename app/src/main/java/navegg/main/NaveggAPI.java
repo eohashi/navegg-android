@@ -33,7 +33,6 @@ public class NaveggAPI extends MultiDexApplication {
         this.context = context;
         this.webService = new WebService(context);
         this.utils = new Utils(context);
-        Log.d("navegg","run 12");
 
         this.user.setLastActivityName(utils.getActivityName());
 

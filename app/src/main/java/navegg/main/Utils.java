@@ -88,7 +88,7 @@ public class Utils {
                     }
                 }
             } catch (SocketException ex) {
-                ex.printStackTrace();
+                //ex.printStackTrace();
             }
         } else if (isConnectedWifi(context)) {
             WifiManager wm = (WifiManager) context.getSystemService(WIFI_SERVICE);
@@ -349,7 +349,7 @@ public class Utils {
         try {
             dateFormated = new SimpleDateFormat("yyyy-MM-dd").parse(date);
         } catch (ParseException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
 
         return dateFormated;

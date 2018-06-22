@@ -13,11 +13,13 @@ import java.util.HashMap;
 public class OnBoarding {
 
     private HashMap data;
+    private int accountId;
     private  SharedPreferences shaPref;
 
-    public OnBoarding(SharedPreferences shaPref) {
+    public OnBoarding(SharedPreferences shaPref, int accountId) {
         this.shaPref = shaPref;
-        String json = this.shaPref.getString("onBoarding","");
+        this.accountId = accountId;
+        String json = this.shaPref.getString("onBoarding"+this.accountId,"");
         this.data = new Gson().fromJson(json, HashMap.class);
         if(this.data==null)
             this.data = new HashMap(){};
@@ -27,15 +29,15 @@ public class OnBoarding {
 
         this.data.put(key,value);
         String jsonString = new Gson().toJson(this.data);
-        this.shaPref.edit().putString("onBoarding", jsonString).commit();
+        this.shaPref.edit().putString("onBoarding"+this.accountId, jsonString).commit();
         this.__set_to_send_onBoarding(true);
     }
     public void __set_to_send_onBoarding(Boolean status){
-        this.shaPref.edit().putBoolean("toSendOnBoarding", status).commit();
+        this.shaPref.edit().putBoolean("toSendOnBoarding"+this.accountId, status).commit();
     }
 
     public Boolean hasToSendOnBoarding(){
-        return this.shaPref.getBoolean("toSendOnBoarding", false);
+        return this.shaPref.getBoolean("toSendOnBoarding"+this.accountId, false);
     }
 
     public String getInfo(String key) {

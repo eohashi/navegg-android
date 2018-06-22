@@ -52,9 +52,9 @@ public class WebService {
     private static List<String> defineParams = new ArrayList<String>(Arrays.asList("prtusride","prtusridc","prtusridr","prtusridf", "prtusridt"));
 
     private static final HashMap ENDPOINTS= new HashMap(){{
-        put("user", "usr");
-        put("request", "cdn");
-        put("onboarding", "cd");
+        put("user", "musr");
+        put("request", "mcdn");
+        put("onboarding", "mcd");
 
     }};
 
@@ -66,8 +66,7 @@ public class WebService {
 
 
     private static String getEndpoint(String endpoint) {
-        return "http://local.navdmp.com";
-        //return "http://"+ENDPOINTS.get(endpoint)+".navdmp.com";
+        return "http://"+ENDPOINTS.get(endpoint)+".navdmp.com";
     }
 
 
@@ -92,9 +91,9 @@ public class WebService {
 
     // envio os dados do mobile
     public void sendDataMobileInfo(final User user, Package.MobileInfo mobileInfo) {
-        if(user.getUserId()=="0")return;
+        if(user.getUserId().equals("0"))return;
         if (utils.verifyConnection()) {
-            ServerAPI apiService = this.getApiService(
+            ServerAPI apiService = WebService.getApiService(
                     "request",
                     ProtoConverterFactory.create()
             ).create(ServerAPI.class);
@@ -116,7 +115,7 @@ public class WebService {
 
                 @Override
                 public void onFailure(Call<Void> call, Throwable t) {
-                    t.printStackTrace();
+                    //t.printStackTrace();
                     call.cancel();
                 }
             });
@@ -129,10 +128,10 @@ public class WebService {
 
     // envio os dados do track de custom para o WS
     public void sendCustomList(final User user, final List<Integer> listCustom) {
-        if(user.getUserId()=="0")return;
+        if(user.getUserId().equals("0"))return;
         if (utils.verifyConnectionWifi()) {
             Call<Void> call1;
-            ServerAPI apiService = this.getApiService(
+            ServerAPI apiService = WebService.getApiService(
                     "request",
                     ProtoConverterFactory.create()
             ).create(ServerAPI.class);
@@ -151,7 +150,7 @@ public class WebService {
 
                     @Override
                     public void onFailure(Call<Void> call, Throwable t) {
-                        t.printStackTrace();
+                        //t.printStackTrace();
                         call.cancel();
                     }
                 });
@@ -170,7 +169,7 @@ public class WebService {
 
         if (utils.verifyConnection() && advertId!=null) {
 
-            ServerAPI apiService = this.getApiService(
+            ServerAPI apiService = WebService.getApiService(
                     "user",
                     GsonConverterFactory.create(
                             new GsonBuilder().setLenient().create()
@@ -182,17 +181,15 @@ public class WebService {
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                     try {
                         String response_body = response.body().string();
-                        Log.d("navegg","valor:"+response_body);
                         JSONObject jsonResponse = new JSONObject(response_body);
-                        Log.d("navegg","string is"+jsonResponse.getString("nvgid"));
                         user.setToSendDataMobileInfo(true);
                         user.__set_user_id(jsonResponse.getString("nvgid"));
                         sendDataMobileInfo(user, user.getDataMobileInfo());
                         getSegments(user);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        //e.printStackTrace();
                     } catch (JSONException e) {
-                        e.printStackTrace();
+                        //e.printStackTrace();
                     }
                     catch (Exception e){
 
@@ -216,7 +213,7 @@ public class WebService {
 
     // envio os dados do track para o WS
     public void sendDataTrack(final User user, List<PageView> pageView) {
-        if(user.getUserId()=="0") return;
+        if(user.getUserId().equals("0")) return;
         Package.Track trackSerialized = utils.setDataTrack(user, utils.setListDataPageView(pageView));
 
         if (utils.verifyConnectionWifi()) {
@@ -229,7 +226,7 @@ public class WebService {
                                     Base64.NO_WRAP
                             )
                     );
-            ServerAPI apiService = this.getApiService(
+            ServerAPI apiService = WebService.getApiService(
                     "request",
                     ProtoConverterFactory.create()
             ).create(ServerAPI.class);
@@ -245,7 +242,7 @@ public class WebService {
 
                 @Override
                 public void onFailure(Call<Void> call, Throwable t) {
-                    t.printStackTrace();
+                    //t.printStackTrace();
                     call.cancel();
                 }
             });
@@ -254,10 +251,10 @@ public class WebService {
 
     // retornando os segmentos do WS
     public void getSegments(final User user) {
-        if(user.getUserId()=="0") return;
+        if(user.getUserId().equals("0")) return;
         if (utils.verifyConnectionWifi()) {
             Call<ResponseBody> call1;
-            ServerAPI apiService = this.getApiService(
+            ServerAPI apiService = WebService.getApiService(
                     "user",
                     GsonConverterFactory.create(
                             new GsonBuilder().setLenient().create()
@@ -268,7 +265,8 @@ public class WebService {
                     0, //want in String
                     11, // Tag Navegg Version
                     user.getUserId(), // Navegg UserId
-                    BuildConfig.VERSION_NAME //SDK version
+                    BuildConfig.VERSION_NAME, //SDK version
+                    1 // want Custom
             );
 
             call1.enqueue(new Callback<ResponseBody>() {
@@ -278,13 +276,13 @@ public class WebService {
                     try {
                         user.saveSegments(response.body().string());
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        //e.printStackTrace();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    t.printStackTrace();
+                    //t.printStackTrace();
                     call.cancel();
                 }
             });
@@ -295,7 +293,7 @@ public class WebService {
 
     // Onboarding
     public void sendOnBoarding(final User user, final OnBoarding onBoarding) {
-        if(user.getUserId()=="0") return;
+        if(user.getUserId().equals("0")) return;
 
         if (utils.verifyConnectionWifi()) {
             Call<Void> call1;
@@ -305,7 +303,7 @@ public class WebService {
                     try {
                         jsonObject.put(par, params.get(par));
                     } catch (JSONException e) {
-                        e.printStackTrace();
+                        //e.printStackTrace();
                     }
                 }
             }
@@ -321,7 +319,7 @@ public class WebService {
                 params.put("DATA", jsonObject.toString());
 
 
-            ServerAPI apiService = this.getApiService(
+            ServerAPI apiService = WebService.getApiService(
                     "onboarding",
                     ProtoConverterFactory.create()
             ).create(ServerAPI.class);
@@ -335,7 +333,7 @@ public class WebService {
 
                 @Override
                 public void onFailure(Call<Void> call, Throwable t) {
-                    t.printStackTrace();
+                    //t.printStackTrace();
                     call.cancel();
                 }
             });

@@ -5,9 +5,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.provider.Settings;
 import android.support.v4.BuildConfig;
-import android.util.Log;
+import android.text.TextUtils;
 import android.webkit.WebView;
 
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
@@ -53,13 +52,6 @@ public class User {
     private OnBoarding onBoarding;
     private JSONObject segments;
     private WebService ws;
-    private final static String[] listSegments = {
-            "gender", "age", "education", "marital",
-            "income", "city", "region", "country",
-            "connection", "brand", "product",
-            "interest", "career", "custom",
-            "everybuyer", "everyone"
-    };
     private List<Integer> listCustomPermanent = new ArrayList<>();
     private String jsonSegments;
 
@@ -68,7 +60,7 @@ public class User {
         this.accountId = accountId;
         this.utils = new Utils(context);
         this.shaPref = context.getSharedPreferences("NVGSDK"+accountId, Context.MODE_PRIVATE);
-        this.userId = this.shaPref.getString("user", null);
+        this.userId = this.shaPref.getString("user"+accountId, null);
         this.ws = new WebService(this.context);
         this.loadAdvertId(this.context);
         this.loadResourcesFromSharedObject();
@@ -78,26 +70,20 @@ public class User {
         return this.advertId;
     }
     private void loadAdvertId(final Context context) {
-
-        Log.d("navegg","buscando o getAdvertId");
         if(this.advertId!=null) return;
 
-        Log.d("navegg","buscando no sharedPref");
         this.advertId = this.shaPref.getString("advertId", null);
         if(this.advertId!=null) return;
 
-        Log.d("navegg","vai bsucar advertId na thread");
         final User thisUser = this;
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
                 try {
-                    Log.d("navegg","dentro da thread...");
                     AdvertisingIdClient.Info adInfo = AdvertisingIdClient.getAdvertisingIdInfo(context);
                     thisUser.advertId = adInfo != null ? adInfo.getId() : null;
                     if(thisUser.advertId!=null)
                         thisUser.shaPref.edit().putString("advertId", thisUser.advertId).apply();
-                    Log.d("navegg","e pegou o valor: "+thisUser.getAdvertId());
                     // Use the advertising id
                 } catch (IOException | GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException exception) {
                     // Error handling if needed
@@ -116,20 +102,19 @@ public class User {
         if(this.trackPageViewList==null)
             this.trackPageViewList = new ArrayList<>();
 
-        json = this.shaPref.getString("customList", "");
+        json = this.shaPref.getString("customList"+this.accountId, "");
         this.customList = gsonTrack.fromJson(json, new TypeToken<List<Integer>>(){}.getType());
         if(this.customList==null)
             this.customList = new ArrayList<>();
 
-        json = this.shaPref.getString("onBoarding", "");
+        json = this.shaPref.getString("onBoarding"+this.accountId, "");
         this.onBoarding = gsonTrack.fromJson(json, new TypeToken<OnBoarding>(){}.getType());
         if(this.onBoarding==null)
-            this.onBoarding = new OnBoarding(this.shaPref);
+            this.onBoarding = new OnBoarding(this.shaPref, this.accountId);
 
 
-        json = this.shaPref.getString("customListAux", "");
+        json = this.shaPref.getString("customListAux"+this.accountId, "");
         this.listCustomPermanent = gsonTrack.fromJson(json, new TypeToken<List<Integer>>(){}.getType());
-        System.out.println("LISTAUX "+ this.listCustomPermanent);
         if(this.listCustomPermanent==null)
             this.listCustomPermanent = new ArrayList<>();
 
@@ -138,7 +123,7 @@ public class User {
 
     /* User Id */
     public void __set_user_id(String userId) {
-        this.shaPref.edit().putString("user", userId).commit();
+        this.shaPref.edit().putString("user"+this.accountId, userId).commit();
         this.userId = userId;
     }
 
@@ -241,7 +226,7 @@ public class User {
 
 
         String json  = new Gson().toJson(this.customList);
-        this.shaPref.edit().putString("customList", json).commit();
+        this.shaPref.edit().putString("customList"+this.accountId, json).commit();
     }
 
     private void setPermanentCustom(int id_custom) {
@@ -249,7 +234,7 @@ public class User {
         if(!listCustomPermanent.contains(id_custom)) {
             listCustomPermanent.add(id_custom);
             String json = new Gson().toJson(this.listCustomPermanent);
-            this.shaPref.edit().putString("customListAux", json).commit();
+            this.shaPref.edit().putString("customListAux"+this.accountId, json).commit();
         }
 
     }
@@ -262,9 +247,9 @@ public class User {
         this.customList.remove(Integer.valueOf(id_custom));
         if(this.customList.size() > 0) {
             String json  = new Gson().toJson(this.customList);
-            this.shaPref.edit().putString("customList", json).commit();
+            this.shaPref.edit().putString("customList"+this.accountId, json).commit();
         }else
-            this.shaPref.edit().remove("customList").commit();
+            this.shaPref.edit().remove("customList"+this.accountId).commit();
 
     }
 
@@ -290,10 +275,9 @@ public class User {
 
     /* Segments */
     public void saveSegments(String segments) {
-        Log.d("navegg","e os segmentos vieram: "+segments);
         try {
-            JSONObject json = new JSONObject();
-            this.shaPref.edit().putString("jsonSegments", json.toString()).apply();
+            JSONObject json = new JSONObject(segments);
+            this.shaPref.edit().putString("jsonSegments"+this.accountId, json.toString()).apply();
             this.shaPref.edit().putLong("dateLastSync", Calendar.getInstance().getTime().getTime()).apply();
         } catch (Exception e) {
             //e.printStackTrace();
@@ -303,70 +287,60 @@ public class User {
     }
 
     public String  getSegments(String segment){
-
         String idSegment = "";
-        this.segments = new JSONObject();
-        jsonSegments = this.shaPref.getString("jsonSegments", "");
-        long dateLastSync = this.shaPref.getLong("dateLastSync", 0);
+        try {
+            this.segments = new JSONObject();
+            jsonSegments = this.shaPref.getString("jsonSegments" + this.accountId, "");
+            long dateLastSync = this.shaPref.getLong("dateLastSync", 0);
 
 
+            if (dateLastSync != 0) {
 
-        if(dateLastSync != 0){
+                Date dateSync = new Date(dateLastSync);
+                Date currentDate = Calendar.getInstance().getTime();
 
-            Date dateSync = new Date(dateLastSync);
-            Date currentDate = Calendar.getInstance().getTime();
-
-            try {
-                dateSync = new SimpleDateFormat("yyyy-MM-dd").parse(utils.dateToString(dateSync));
-                currentDate = new SimpleDateFormat("yyyy-MM-dd").parse(utils.dateToString(currentDate));
-            } catch (ParseException e) {
-                e.printStackTrace();
+                try {
+                    dateSync = new SimpleDateFormat("yyyy-MM-dd").parse(utils.dateToString(dateSync));
+                    currentDate = new SimpleDateFormat("yyyy-MM-dd").parse(utils.dateToString(currentDate));
+                } catch (ParseException e) {
+                    //e.printStackTrace();
+                }
+                if (currentDate.after(dateSync)) {
+                    this.ws.getSegments(this);
+                }
             }
 
-            if(currentDate.after(dateSync)){
-                this.ws.getSegments(this);
-            }
+            if (jsonSegments != null && !jsonSegments.equals(""))
+                try {
+                    this.segments = new JSONObject(jsonSegments);
+                    joinCustomSegments();
+                    idSegment = (String) this.segments.get(segment.toLowerCase().trim());
+                } catch (JSONException e) {
+                    //e.printStackTrace();
+                }
+
+        }catch (Exception e){
+            //Log.d("navegg","Error on get segment: "+segment);
         }
-
-        if(jsonSegments!=null && !jsonSegments.equals(""))
-            try {
-                this.segments = new JSONObject(jsonSegments);
-                setDistinticSegments();
-                idSegment = (String) this.segments.get(segment.toLowerCase().trim());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-
 
         return idSegment;
     }
 
-    private void setDistinticSegments() {
-        String segment = "";
+    private void joinCustomSegments() {
         try {
-                if (this.segments.has("custom")) {
-                    segment = (String) this.segments.getString("custom");
-
-                    for (int custom = 0; custom < this.listCustomPermanent.size(); custom++) {
-                        if (!segment.equals("")) {
-                            this.segments.put("custom", "-" + this.listCustomPermanent.get(custom).toString());
-                        } else {
-                            this.segments.put("custom", "" + this.listCustomPermanent.get(custom).toString());
-                        }
-                    }
-                }else{
-                    for (int custom = 0; custom < this.listCustomPermanent.size(); custom++) {
-                        if (!segment.equals("")) {
-                            this.segments.put("custom", "-" + this.listCustomPermanent.get(custom).toString());
-                        } else {
-                            this.segments.put("custom", "" + this.listCustomPermanent.get(custom).toString());
-                        }
-
+            List<Integer> newCustomList = this.listCustomPermanent;
+            String customSegment = (String) this.segments.getString("custom");
+            if (!customSegment.equals("")) {
+                for (String field : customSegment.split("-")) {
+                    Integer customId = Integer.parseInt(field);
+                    if (!newCustomList.contains(customId)) {
+                        newCustomList.add(customId);
                     }
                 }
-        } catch (JSONException e) {
-            e.printStackTrace();
+            }
+            this.segments.put("custom", TextUtils.join("-", newCustomList));
+        } catch (Exception e) {
+            //e.printStackTrace();
         }
 
 

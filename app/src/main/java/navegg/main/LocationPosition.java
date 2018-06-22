@@ -97,7 +97,7 @@ public class LocationPosition implements LocationListener {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
 
         return location;

@@ -48,7 +48,7 @@ public class VerifyStateConnection extends BroadcastReceiver {
                 User user = new User(context, accountId);
 
                 //First contact with WS
-                if(user.getUserId()=="0")
+                if(user.getUserId().equals("0"))
                     webService.createUserId(user);
 
                 //Send Track
