@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -217,21 +218,23 @@ public class Utils {
 
 
         String activityName = "";
+        try {
+            ActivityManager am = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
+            List<ActivityManager.AppTask> tasks = null;
 
-        ActivityManager am = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
-        List<ActivityManager.AppTask> tasks = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                tasks = am.getAppTasks();
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            tasks = am.getAppTasks();
-
-            for (ActivityManager.AppTask task : tasks) {
-                activityName = task.getTaskInfo().topActivity.getClassName();
+                for (ActivityManager.AppTask task : tasks) {
+                    ComponentName topActivity = task.getTaskInfo().topActivity;
+                    if (topActivity == null) continue;
+                    activityName = topActivity.getClassName();
+                }
+            } else {
+                List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(2);
+                activityName = taskInfo.get(0).topActivity.getClassName();
             }
-        }
-        else {
-            List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(2);
-            activityName = taskInfo.get(0).topActivity.getClassName();
-        }
+        }catch (Exception e){}
 
         return activityName;
     }
