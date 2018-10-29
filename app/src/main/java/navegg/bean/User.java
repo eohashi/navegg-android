@@ -8,10 +8,12 @@ import android.os.Build;
 import android.support.v4.BuildConfig;
 import android.text.TextUtils;
 import android.webkit.WebView;
+import android.util.Log;
 
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
+
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
@@ -61,6 +63,7 @@ public class User {
         this.utils = new Utils(context);
         this.shaPref = context.getSharedPreferences("NVGSDK"+accountId, Context.MODE_PRIVATE);
         this.userId = this.shaPref.getString("user"+accountId, null);
+        this.onBoarding = new OnBoarding(this.shaPref, this.utils, this.accountId, this.context);
         this.ws = new WebService(this.context);
         this.loadAdvertId(this.context);
         this.loadResourcesFromSharedObject();
@@ -82,11 +85,14 @@ public class User {
                 try {
                     AdvertisingIdClient.Info adInfo = AdvertisingIdClient.getAdvertisingIdInfo(context);
                     thisUser.advertId = adInfo != null ? adInfo.getId() : null;
-                    if(thisUser.advertId!=null)
+                    if (thisUser.advertId != null)
                         thisUser.shaPref.edit().putString("advertId", thisUser.advertId).apply();
                     // Use the advertising id
-                } catch (IOException | GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException exception) {
-                    // Error handling if needed
+                } catch (Exception e){
+                    Log.e("Error","Error Exception: " + e);
+                } catch (Throwable t) {
+                    // not avalible google play
+                    Log.e("Error","Error getting advertising ID. Google Play Services are not available: " + t);
                 }
             }
         });
@@ -107,18 +113,10 @@ public class User {
         if(this.customList==null)
             this.customList = new ArrayList<>();
 
-        json = this.shaPref.getString("onBoarding"+this.accountId, "");
-        this.onBoarding = gsonTrack.fromJson(json, new TypeToken<OnBoarding>(){}.getType());
-        if(this.onBoarding==null)
-            this.onBoarding = new OnBoarding(this.shaPref, this.accountId);
-
-
         json = this.shaPref.getString("customListAux"+this.accountId, "");
         this.listCustomPermanent = gsonTrack.fromJson(json, new TypeToken<List<Integer>>(){}.getType());
         if(this.listCustomPermanent==null)
             this.listCustomPermanent = new ArrayList<>();
-
-
     }
 
     /* User Id */
@@ -258,8 +256,9 @@ public class User {
         return this.onBoarding;
     }
 
-    public void setOnBoarding(String key, String value) {
-        this.onBoarding.addInfo(key, value);
+    public boolean setOnBoarding(String key, String value) {
+
+        return this.onBoarding.addInfo(key, value);
     }
 
 
