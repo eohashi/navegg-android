@@ -52,10 +52,9 @@ public class WebService {
     private static List<String> defineParams = new ArrayList<String>(Arrays.asList("prtusride","prtusridc","prtusridr","prtusridf", "prtusridt"));
 
     private static final HashMap ENDPOINTS= new HashMap(){{
-        put("user", "musr");
+        put("app", "app");
         put("request", "mcdn");
         put("onboarding", "mcd");
-
     }};
 
 
@@ -170,7 +169,7 @@ public class WebService {
         if (utils.verifyConnection() && advertId!=null) {
 
             ServerAPI apiService = WebService.getApiService(
-                    "user",
+                    "app",
                     GsonConverterFactory.create(
                             new GsonBuilder().setLenient().create()
                     )
@@ -190,8 +189,7 @@ public class WebService {
                         //e.printStackTrace();
                     } catch (JSONException e) {
                         //e.printStackTrace();
-                    }
-                    catch (Exception e){
+                    } catch (Exception e){
 
                     }
 
@@ -206,9 +204,6 @@ public class WebService {
 
         }
     }
-
-
-
 
 
     // envio os dados do track para o WS
@@ -255,7 +250,7 @@ public class WebService {
         if (utils.verifyConnectionWifi()) {
             Call<ResponseBody> call1;
             ServerAPI apiService = WebService.getApiService(
-                    "user",
+                    "app",
                     GsonConverterFactory.create(
                             new GsonBuilder().setLenient().create()
                     )
@@ -266,7 +261,8 @@ public class WebService {
                     11, // Tag Navegg Version
                     user.getUserId(), // Navegg UserId
                     BuildConfig.VERSION_NAME, //SDK version
-                    1 // want Custom
+                    1, // want Custom
+                    user.getOnBoarding().__get_hash_map()
             );
 
             call1.enqueue(new Callback<ResponseBody>() {
@@ -275,7 +271,7 @@ public class WebService {
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                     try {
                         user.saveSegments(response.body().string());
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         //e.printStackTrace();
                     }
                 }
@@ -302,7 +298,7 @@ public class WebService {
                 if(!defineParams.contains(par) && !par.equalsIgnoreCase("DATA")){
                     try {
                         jsonObject.put(par, params.get(par));
-                    } catch (JSONException e) {
+                    } catch (Exception e) {
                         //e.printStackTrace();
                     }
                 }
@@ -329,6 +325,7 @@ public class WebService {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
                     user.getOnBoarding().__set_to_send_onBoarding(false);
+                    user.getOnBoarding().setDateLastSync();
                 }
 
                 @Override
