@@ -36,7 +36,6 @@ public class NaveggAPI extends MultiDexApplication {
 
         this.user.setLastActivityName(utils.getActivityName());
 
-
         if(this.user.getUserId().equals("0")) {
             this.webService.createUserId(this.user);
         }
@@ -96,9 +95,11 @@ public class NaveggAPI extends MultiDexApplication {
         return this.user.getUserId();
     }
 
+
     public void setOnBoarding(String key, String value) {
-        this.user.setOnBoarding(key, value);
-        this.webService.sendOnBoarding(this.user, this.user.getOnBoarding());
+        if (this.user.setOnBoarding(key, value)) {
+            this.webService.sendOnBoarding(this.user, this.user.getOnBoarding());
+        }
     }
 
     public String getOnBoarding(String key) {
