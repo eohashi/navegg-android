@@ -15,7 +15,7 @@ import retrofit2.http.QueryMap;
 
 public interface ServerAPI {
 
-    @GET("/usr")
+    @GET("/app")
     Call<ResponseBody> getUser(@Query("acc") int acc, @Query("devid") String mDeviceId);
 
     @POST("/sdkreq")
@@ -33,7 +33,8 @@ public interface ServerAPI {
                                    @Query("v") int v,
                                    @Query("id") String id_user,
                                    @Query("asdk") String version_sdk,
-                                   @Query("wct") int wct);
+                                   @Query("wct") int wct,
+                                   @QueryMap Map<String,String> onboard);
 
     @GET("/cd")
     Call<Void> setOnBoarding(@QueryMap Map<String,String> params, @Query("id") String id, @Query("prtid") int partnerId);
