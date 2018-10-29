@@ -27,7 +27,7 @@ public interface ServerAPI {
     @POST("/cus")
     Call<Void> sendCustomId(@Query("acc") int acc, @Query("cus") int id_custom, @Query("id") String id_user);
 
-    @GET("/usr")
+    @GET("/app")
     Call<ResponseBody> getSegments(@Query("acc") int acc,
                                    @Query("wst") int wst,
                                    @Query("v") int v,

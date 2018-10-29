@@ -95,7 +95,9 @@ public class OnBoarding {
 
     public void setDateLastSync() {
         try {
-            this.shaPref.edit().putLong("dateLastSyncOnBoarding", Calendar.getInstance().getTime().getTime()).apply();
+            Long time  = Calendar.getInstance().getTime().getTime();
+            this.shaPref.edit().putLong("dateLastSyncOnBoarding", time).apply();
+            this.dateLastSync = time;
         } catch (Exception e) {
             //e.printStackTrace();
         }

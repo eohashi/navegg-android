@@ -291,7 +291,7 @@ public class User {
             this.segments = new JSONObject();
             jsonSegments = this.shaPref.getString("jsonSegments" + this.accountId, "");
             long dateLastSync = this.shaPref.getLong("dateLastSync", 0);
-
+            long dateLastSyncOnBoard = this.getOnBoarding().getDateLastSync();
 
             if (dateLastSync != 0) {
 
@@ -306,8 +306,15 @@ public class User {
                 }
                 if (currentDate.after(dateSync)) {
                     this.ws.getSegments(this);
+                } else {
+                    if (dateLastSync < dateLastSyncOnBoard) {
+                        this.ws.getSegments(this);
+                    }
                 }
+            } else {
+                this.ws.getSegments(this);
             }
+
 
             if (jsonSegments != null && !jsonSegments.equals(""))
                 try {
