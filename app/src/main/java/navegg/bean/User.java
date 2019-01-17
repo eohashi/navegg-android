@@ -67,6 +67,12 @@ public class User {
         this.ws = new WebService(this.context);
         this.loadAdvertId(this.context);
         this.loadResourcesFromSharedObject();
+
+        if (!this.getUserId().equals("0")) {
+            if (!this.hasToSendDataMobileInfo()) {
+                this.ws.sendDataMobileInfo(this, this.getDataMobileInfo());
+            }
+        }
     }
 
     public String getAdvertId(){
@@ -140,11 +146,11 @@ public class User {
     }
 
     public Boolean hasToSendDataMobileInfo(){
-        return this.shaPref.getBoolean("sendDataMobileInfo", false);
+        return this.shaPref.getBoolean("sentMobileInfo", false);
     }
 
     public void setToSendDataMobileInfo(Boolean status){
-        this.shaPref.edit().putBoolean("sendDataMobileInfo", status).commit();
+        this.shaPref.edit().putBoolean("sentMobileInfo", status).commit();
     }
 
     /* MobileInfo */
