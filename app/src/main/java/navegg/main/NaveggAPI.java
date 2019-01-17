@@ -71,18 +71,11 @@ public class NaveggAPI extends MultiDexApplication {
 
 
     public void setTrackPage(String activity){
-        if (this.user.hasToSendDataMobileInfo()) {
-            this.webService.sendDataMobileInfo(this.user, this.user.getDataMobileInfo());
-        }
-
         this.user.makeAPageView(activity);
         this.webService.sendDataTrack(this.user, this.user.getTrackPageViewList());
     }
 
     public void setCustom(int id_custom){
-        if (!this.user.hasToSendDataMobileInfo()) {
-            this.webService.sendDataMobileInfo(this.user, this.user.getDataMobileInfo());
-        }
         this.user.setCustom(id_custom);
         this.webService.sendCustomList(this.user, this.user.getCustomList());
     }
