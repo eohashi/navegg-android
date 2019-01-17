@@ -49,12 +49,12 @@ public class WebService {
     private Utils utils;
     private JSONObject jsonObject = new JSONObject();
 
-    private static List<String> defineParams = new ArrayList<String>(Arrays.asList("prtusride","prtusridc","prtusridr","prtusridf", "prtusridt"));
+    private static List<String> defineParams = new ArrayList<String>(Arrays.asList("prtusride","prtusridc","prtusridr","prtusridf","prtusridt"));
 
     private static final HashMap ENDPOINTS= new HashMap(){{
         put("app", "app");
-        put("request", "mcdn");
-        put("onboarding", "mcd");
+        put("request", "cdn");
+        put("onboarding", "cd");
     }};
 
 
@@ -104,17 +104,38 @@ public class WebService {
                                     Base64.NO_WRAP
                             )
                     );
-            Call<Void> call1 = apiService.sendDataMobileInfo(body);
+            Call<ResponseBody> call1 = apiService.sendDataMobileInfo(body);
 
-            call1.enqueue(new Callback<Void>() {
+            call1.enqueue(new Callback<ResponseBody>() {
                 @Override
-                public void onResponse(Call<Void> call, Response<Void> response) {
-                    user.setToSendDataMobileInfo(true);
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+
+                    try {
+                        String response_body = response.body().string();
+                        JSONObject jsonResponse = new JSONObject(response_body);
+                        Boolean status = jsonResponse.getBoolean("status");
+                        if (status) {
+                            user.setToSendDataMobileInfo(true);
+                        } else {
+                            user.setToSendDataMobileInfo(false);
+                        }
+                    } catch (IOException e) {
+                        //e.printStackTrace();
+                        user.setToSendDataMobileInfo(false);
+
+                    } catch (JSONException e) {
+                        //e.printStackTrace();
+                        user.setToSendDataMobileInfo(false);
+
+                    } catch (Exception e){
+                        user.setToSendDataMobileInfo(false);
+                    }
                 }
 
                 @Override
-                public void onFailure(Call<Void> call, Throwable t) {
+                public void onFailure(Call<ResponseBody>  call, Throwable t) {
                     //t.printStackTrace();
+                    user.setToSendDataMobileInfo(false);
                     call.cancel();
                 }
             });
