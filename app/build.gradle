@@ -1,6 +1,9 @@
 apply plugin: 'com.android.library'
 apply plugin: 'maven'
 
+apply plugin: 'com.github.dcendents.android-maven'
+group = 'com.github.Navegg'
+
 android {
     compileSdkVersion 26
     buildToolsVersion "28.0.3"
@@ -21,17 +24,17 @@ android {
 }
 
 //USED TO DEBUG LOCAL
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            // mudar esse reposotório para gerar o AAR
-            repository(url: "file:///home/renan/dev/sdk-android")
-            pom.groupId = GROUP
-            pom.artifactId = POM_ARTIFACT_ID
-            pom.version = VERSION_NAME
-        }
-    }
-}
+//uploadArchives {
+//    repositories {
+//        mavenDeployer {
+//            // mudar esse reposotório para gerar o AAR
+//            repository(url: "file:///home/renan/dev/sdk-android")
+//            pom.groupId = GROUP
+//            pom.artifactId = POM_ARTIFACT_ID
+//            pom.version = VERSION_NAME
+//        }
+//    }
+//}
 
 configurations {
     myConfig
@@ -63,7 +66,7 @@ dependencies {
 }
 
 /* USED TO DEVELOPER */
-task install(dependsOn: uploadArchives)
+//task install(dependsOn: uploadArchives)
 
 task copyLibs(type: Copy) {
     // Now you can use 'myConfig' instead of 'implementation' or 'compile'
