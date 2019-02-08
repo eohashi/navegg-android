@@ -170,7 +170,7 @@ public class User {
                 .setVersionCode(BuildConfig.VERSION_CODE)
                 .setVersionOS(Build.VERSION.SDK_INT)
                 .setAndroidFingerPrint(Build.FINGERPRINT)
-                .setUserAgent(new WebView(context).getSettings().getUserAgentString())
+                .setUserAgent("Android")
                 .setLinkPlayStore(this.utils.getLinkPlayStore())
                 .setTypeCategory(this.utils.getTypeCategory())
                 .setImei(this.utils.getIMEI())
