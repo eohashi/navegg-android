@@ -27,6 +27,6 @@ allprojects {
     }
 }
 
-task cleana(type: Delete) {
+task nvgClean(type: Delete) {
     delete rootProject.buildDir
 }
