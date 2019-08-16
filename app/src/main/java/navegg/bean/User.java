@@ -132,8 +132,12 @@ public class User {
     }
 
     public String getUserId() {
-        if(this.userId==null)
+
+        if(this.userId==null){
+            Log.d("UserID", "0");
             return "0";
+        }
+        Log.d("UserID", this.userId);
         return this.userId;
     }
 
