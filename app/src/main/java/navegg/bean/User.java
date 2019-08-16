@@ -127,7 +127,7 @@ public class User {
 
     /* User Id */
     public void __set_user_id(String userId) {
-        this.shaPref.edit().putString("user"+this.accountId, userId).commit();
+        this.shaPref.edit().putString("user"+this.accountId, userId).apply();
         this.userId = userId;
     }
 
@@ -146,7 +146,7 @@ public class User {
     }
 
     public void setBroadcastRunning(Boolean status){
-        this.shaPref.edit().putBoolean("broadCastRunning", status).commit();
+        this.shaPref.edit().putBoolean("broadCastRunning", status).apply();
     }
 
     public Boolean hasToSendDataMobileInfo(){
@@ -154,7 +154,7 @@ public class User {
     }
 
     public void setToSendDataMobileInfo(Boolean status){
-        this.shaPref.edit().putBoolean("sentMobileInfo", status).commit();
+        this.shaPref.edit().putBoolean("sentMobileInfo", status).apply();
     }
 
     /* MobileInfo */
@@ -212,7 +212,7 @@ public class User {
 
         Gson gson = new Gson();
         String json = gson.toJson(this.trackPageViewList);
-        this.shaPref.edit().putString("listAppPageView", json).commit();
+        this.shaPref.edit().putString("listAppPageView", json).apply();
     }
 
     public void cleanPageViewList() {
@@ -234,7 +234,7 @@ public class User {
 
 
         String json  = new Gson().toJson(this.customList);
-        this.shaPref.edit().putString("customList"+this.accountId, json).commit();
+        this.shaPref.edit().putString("customList"+this.accountId, json).apply();
     }
 
     private void setPermanentCustom(int id_custom) {
@@ -242,7 +242,7 @@ public class User {
         if(!listCustomPermanent.contains(id_custom)) {
             listCustomPermanent.add(id_custom);
             String json = new Gson().toJson(this.listCustomPermanent);
-            this.shaPref.edit().putString("customListAux"+this.accountId, json).commit();
+            this.shaPref.edit().putString("customListAux"+this.accountId, json).apply();
         }
 
     }
@@ -255,9 +255,9 @@ public class User {
         this.customList.remove(Integer.valueOf(id_custom));
         if(this.customList.size() > 0) {
             String json  = new Gson().toJson(this.customList);
-            this.shaPref.edit().putString("customList"+this.accountId, json).commit();
+            this.shaPref.edit().putString("customList"+this.accountId, json).apply();
         }else
-            this.shaPref.edit().remove("customList"+this.accountId).commit();
+            this.shaPref.edit().remove("customList"+this.accountId).apply();
 
     }
 

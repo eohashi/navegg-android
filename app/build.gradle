@@ -12,7 +12,7 @@ android {
         targetSdkVersion 28
         multiDexEnabled true
         versionCode 2
-        versionName "1.1.4"
+        versionName "1.1.6"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -24,17 +24,17 @@ android {
 }
 
 //USED TO DEBUG LOCAL
-//uploadArchives {
-//    repositories {
-//        mavenDeployer {
-//            // mudar esse reposotório para gerar o AAR
-//            repository(url: "file:///webdocs/libsdk")
-//            pom.groupId = GROUP
-//            pom.artifactId = POM_ARTIFACT_ID
-//            pom.version = VERSION_NAME
-//        }
-//    }
-//}
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            // mudar esse reposotório para gerar o AAR
+            repository(url: "file:///webdocs/libsdk")
+            pom.groupId = GROUP
+            pom.artifactId = POM_ARTIFACT_ID
+            pom.version = VERSION_NAME
+        }
+    }
+}
 
 configurations {
     myConfig
@@ -68,7 +68,7 @@ dependencies {
 }
 
 /* USED TO DEVELOPER */
-//task install(dependsOn: uploadArchives)
+task install(dependsOn: uploadArchives)
 
 task copyLibs(type: Copy) {
     // Now you can use 'myConfig' instead of 'implementation' or 'compile'
