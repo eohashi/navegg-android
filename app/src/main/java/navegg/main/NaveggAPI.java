@@ -4,9 +4,8 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
-import android.support.multidex.MultiDex;
-import android.support.multidex.MultiDexApplication;
-import android.util.Log;
+import androidx.multidex.MultiDex;
+import androidx.multidex.MultiDexApplication;
 
 
 import com.google.gson.Gson;

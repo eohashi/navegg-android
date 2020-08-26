@@ -5,14 +5,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.support.v4.BuildConfig;
+import navegg.BuildConfig;
 import android.text.TextUtils;
-import android.webkit.WebView;
 import android.util.Log;
 
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
@@ -21,7 +18,6 @@ import com.google.gson.reflect.TypeToken;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -127,17 +123,13 @@ public class User {
 
     /* User Id */
     public void __set_user_id(String userId) {
-        this.shaPref.edit().putString("user"+this.accountId, userId).apply();
+        this.shaPref.edit().putString("user"+this.accountId, userId).commit();
         this.userId = userId;
     }
 
     public String getUserId() {
-
-        if(this.userId==null){
-            Log.d("UserID", "0");
+        if(this.userId==null)
             return "0";
-        }
-        Log.d("UserID", this.userId);
         return this.userId;
     }
 
@@ -146,7 +138,7 @@ public class User {
     }
 
     public void setBroadcastRunning(Boolean status){
-        this.shaPref.edit().putBoolean("broadCastRunning", status).apply();
+        this.shaPref.edit().putBoolean("broadCastRunning", status).commit();
     }
 
     public Boolean hasToSendDataMobileInfo(){
@@ -154,7 +146,7 @@ public class User {
     }
 
     public void setToSendDataMobileInfo(Boolean status){
-        this.shaPref.edit().putBoolean("sentMobileInfo", status).apply();
+        this.shaPref.edit().putBoolean("sentMobileInfo", status).commit();
     }
 
     /* MobileInfo */
@@ -212,7 +204,7 @@ public class User {
 
         Gson gson = new Gson();
         String json = gson.toJson(this.trackPageViewList);
-        this.shaPref.edit().putString("listAppPageView", json).apply();
+        this.shaPref.edit().putString("listAppPageView", json).commit();
     }
 
     public void cleanPageViewList() {
@@ -234,7 +226,7 @@ public class User {
 
 
         String json  = new Gson().toJson(this.customList);
-        this.shaPref.edit().putString("customList"+this.accountId, json).apply();
+        this.shaPref.edit().putString("customList"+this.accountId, json).commit();
     }
 
     private void setPermanentCustom(int id_custom) {
@@ -242,7 +234,7 @@ public class User {
         if(!listCustomPermanent.contains(id_custom)) {
             listCustomPermanent.add(id_custom);
             String json = new Gson().toJson(this.listCustomPermanent);
-            this.shaPref.edit().putString("customListAux"+this.accountId, json).apply();
+            this.shaPref.edit().putString("customListAux"+this.accountId, json).commit();
         }
 
     }
@@ -255,9 +247,9 @@ public class User {
         this.customList.remove(Integer.valueOf(id_custom));
         if(this.customList.size() > 0) {
             String json  = new Gson().toJson(this.customList);
-            this.shaPref.edit().putString("customList"+this.accountId, json).apply();
+            this.shaPref.edit().putString("customList"+this.accountId, json).commit();
         }else
-            this.shaPref.edit().remove("customList"+this.accountId).apply();
+            this.shaPref.edit().remove("customList"+this.accountId).commit();
 
     }
 

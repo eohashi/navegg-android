@@ -5,15 +5,15 @@ apply plugin: 'maven'
 group = 'com.github.Navegg'
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion "29.0.2"
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
     defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 28
+        minSdkVersion 21
+        targetSdkVersion 29
         multiDexEnabled true
         versionCode 2
-        versionName "1.1.6"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        versionName "1.1.8"
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
         release {
@@ -24,17 +24,17 @@ android {
 }
 
 //USED TO DEBUG LOCAL
-//uploadArchives {
-//    repositories {
-//        mavenDeployer {
-//            // mudar esse reposotório para gerar o AAR
-//            repository(url: "file:///webdocs/libsdk")
-//            pom.groupId = GROUP
-//            pom.artifactId = POM_ARTIFACT_ID
-//            pom.version = VERSION_NAME
-//        }
-//    }
-//}
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            // mudar esse reposotório para gerar o AAR
+            repository(url: "file:E:\\Users\\Eduardo\\Documents\\crts\\libsdk")
+            pom.groupId = GROUP
+            pom.artifactId = POM_ARTIFACT_ID
+            pom.version = VERSION_NAME
+        }
+    }
+}
 
 configurations {
     myConfig
@@ -42,33 +42,33 @@ configurations {
 
 dependencies {
     implementation fileTree(include: ['*.arr','*.jar'], dir: 'libs')
-    implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'com.android.support:support-v4:26.0.0'
-    implementation 'com.squareup.retrofit2:converter-protobuf:2.6.1'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'com.squareup.retrofit2:converter-protobuf:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.6.1'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.1.0'
     implementation 'com.squareup.okhttp3:okhttp:4.1.0'
-    implementation 'com.android.support:multidex:1.0.3'
-    implementation 'com.google.android.gms:play-services-ads:18.1.1'
+    implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'com.google.android.gms:play-services-ads:19.3.0'
     testImplementation 'junit:junit:4.13-beta-3'
-    androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.2', {
+    androidTestImplementation('androidx.test.espresso:espresso-core:3.1.0', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
 
     myConfig fileTree(include: ['*.arr','*.jar'], dir: 'libs')
-    myConfig 'androidx.appcompat:appcompat:1.0.2'
-    myConfig 'com.android.support:support-v4:26.0.0'
-    myConfig 'com.squareup.retrofit2:converter-protobuf:2.6.1'
+    myConfig 'androidx.appcompat:appcompat:1.2.0'
+    myConfig 'androidx.legacy:legacy-support-v4:1.0.0'
+    myConfig 'com.squareup.retrofit2:converter-protobuf:2.9.0'
     myConfig 'com.squareup.retrofit2:converter-gson:2.6.1'
     myConfig 'com.squareup.okhttp3:logging-interceptor:4.1.0'
     myConfig 'com.squareup.okhttp3:okhttp:4.1.0'
-    myConfig 'com.android.support:multidex:1.0.3'
-    myConfig 'com.google.android.gms:play-services-ads:18.1.1'
+    myConfig 'androidx.multidex:multidex:2.0.1'
+    myConfig 'com.google.android.gms:play-services-ads:19.3.0'
 }
 
 /* USED TO DEVELOPER */
-//task install(dependsOn: uploadArchives)
+task install(dependsOn: uploadArchives)
 
 task copyLibs(type: Copy) {
     // Now you can use 'myConfig' instead of 'implementation' or 'compile'
