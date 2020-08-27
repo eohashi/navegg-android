@@ -36,9 +36,9 @@ android {
 //    }
 //}
 
-configurations {
+/*configurations {
     myConfig
-}
+}*/
 
 dependencies {
     implementation fileTree(include: ['*.arr','*.jar'], dir: 'libs')
@@ -58,7 +58,7 @@ dependencies {
     })
 
 
-    myConfig fileTree(include: ['*.arr','*.jar'], dir: 'libs')
+    /*myConfig fileTree(include: ['*.arr','*.jar'], dir: 'libs')
     myConfig 'androidx.appcompat:appcompat:1.2.0'
     myConfig 'androidx.legacy:legacy-support-v4:1.0.0'
     myConfig 'com.squareup.retrofit2:converter-protobuf:2.9.0'
@@ -66,17 +66,17 @@ dependencies {
     myConfig 'com.squareup.okhttp3:logging-interceptor:4.1.0'
     myConfig 'com.squareup.okhttp3:okhttp:4.1.0'
     myConfig 'androidx.multidex:multidex:2.0.1'
-    myConfig 'com.google.android.gms:play-services-ads:19.3.0'
+    myConfig 'com.google.android.gms:play-services-ads:19.3.0'*/
 }
 
 /* USED TO DEVELOPER */
 //task install(dependsOn: uploadArchives)
 
-task copyLibs(type: Copy) {
+/*task copyLibs(type: Copy) {
     // Now you can use 'myConfig' instead of 'implementation' or 'compile'
     from configurations.myConfig
     into "$project.rootDir/app/libs/"
-}
+}/*
 
 //task deleteJar(type: Delete) {
 //    delete 'libs/libsdk.jar'
