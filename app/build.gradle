@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'maven'
 
-//apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.github.dcendents.android-maven'
 group = 'com.github.Navegg'
 
 android {
@@ -24,17 +24,17 @@ android {
 }
 
 //USED TO DEBUG LOCAL
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            // mudar esse reposotório para gerar o AAR
-            repository(url: "file:E:\\Users\\Eduardo\\Documents\\crts\\libsdk")
-            pom.groupId = GROUP
-            pom.artifactId = POM_ARTIFACT_ID
-            pom.version = VERSION_NAME
-        }
-    }
-}
+//uploadArchives {
+//    repositories {
+//        mavenDeployer {
+//            // mudar esse reposotório para gerar o AAR
+//            repository(url: "file:E:\\Users\\Eduardo\\Documents\\crts\\libsdk")
+//            pom.groupId = GROUP
+//            pom.artifactId = POM_ARTIFACT_ID
+//            pom.version = VERSION_NAME
+//        }
+//    }
+//}
 
 configurations {
     myConfig
@@ -44,7 +44,9 @@ dependencies {
     implementation fileTree(include: ['*.arr','*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'com.squareup.retrofit2:converter-protobuf:2.9.0'
+    implementation('com.squareup.retrofit2:converter-protobuf:2.9.0'){
+        exclude group: 'com.google.protobuf'
+    }
     implementation 'com.squareup.retrofit2:converter-gson:2.6.1'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.1.0'
     implementation 'com.squareup.okhttp3:okhttp:4.1.0'
@@ -68,7 +70,7 @@ dependencies {
 }
 
 /* USED TO DEVELOPER */
-task install(dependsOn: uploadArchives)
+//task install(dependsOn: uploadArchives)
 
 task copyLibs(type: Copy) {
     // Now you can use 'myConfig' instead of 'implementation' or 'compile'
