@@ -12,7 +12,7 @@ android {
         targetSdkVersion 29
         multiDexEnabled true
         versionCode 2
-        versionName "1.1.14"
+        versionName "1.1.15"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
@@ -44,9 +44,7 @@ dependencies {
     implementation fileTree(include: ['*.arr','*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation('com.squareup.retrofit2:converter-protobuf:2.9.0'){
-        exclude group: 'com.google.protobuf'
-    }
+    implementation 'com.squareup.retrofit2:converter-protobuf:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.6.1'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.1.0'
     implementation 'com.squareup.okhttp3:okhttp:4.1.0'
@@ -59,13 +57,13 @@ dependencies {
 
 
     myConfig fileTree(include: ['*.arr','*.jar'], dir: 'libs')
-    myConfig 'androidx.appcompat:appcompat:1.2.0'
-    myConfig 'androidx.legacy:legacy-support-v4:1.0.0'
-    myConfig 'com.squareup.retrofit2:converter-protobuf:2.9.0'
-    myConfig 'com.squareup.retrofit2:converter-gson:2.6.1'
-    myConfig 'com.squareup.okhttp3:logging-interceptor:4.1.0'
-    myConfig 'com.squareup.okhttp3:okhttp:4.1.0'
-    myConfig 'androidx.multidex:multidex:2.0.1'
+    //myConfig 'androidx.appcompat:appcompat:1.2.0'
+   // myConfig 'androidx.legacy:legacy-support-v4:1.0.0'
+   // myConfig 'com.squareup.retrofit2:converter-protobuf:2.9.0'
+   // myConfig 'com.squareup.retrofit2:converter-gson:2.6.1'
+  //  myConfig 'com.squareup.okhttp3:logging-interceptor:4.1.0'
+   // myConfig 'com.squareup.okhttp3:okhttp:4.1.0'
+   // myConfig 'androidx.multidex:multidex:2.0.1'
     myConfig 'com.google.android.gms:play-services-ads:19.3.0'
 }
 
