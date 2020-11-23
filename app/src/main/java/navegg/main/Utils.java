@@ -9,10 +9,12 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
+import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 
+import androidx.annotation.IntRange;
 import androidx.core.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.text.format.Formatter;
@@ -172,7 +174,7 @@ public class Utils {
             TelephonyManager mTelephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
             String IMEI = mTelephonyManager.getDeviceId();
 
-            return IMEI;
+            return "";
         }
     }
 
@@ -253,9 +255,26 @@ public class Utils {
 
 
     public boolean verifyConnection() {
-        boolean connected;
+        boolean connected = false;
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (cm != null) {
+                NetworkCapabilities capabilities = cm.getNetworkCapabilities(cm.getActiveNetwork());
+                if (capabilities != null) {
+                    if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                        connected = true;
+                    } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                        connected = true;
+                    } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
+                        connected = true;
+                    }
+                }
+            }
+        }
+        return connected;
+        /*boolean connected;
         ConnectivityManager conectivtyManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = conectivtyManager.getActiveNetworkInfo();
+        int activeNetwork = getConnectionType(context.getSystemService(Context.CONNECTIVITY_SERVICE));
         if (activeNetwork != null) {
             if (conectivtyManager.getActiveNetworkInfo() != null
                     && conectivtyManager.getActiveNetworkInfo().isAvailable()
@@ -269,9 +288,8 @@ public class Utils {
         }
 
 
-        return connected;
+        return connected;*/
     }
-
 
     public boolean verifyConnectionWifi() {
         boolean connected;
