@@ -65,7 +65,7 @@ public class WebService {
 
 
     private static String getEndpoint(String endpoint) {
-        return "http://"+ENDPOINTS.get(endpoint)+".navdmp.com";
+        return "https://"+ENDPOINTS.get(endpoint)+".navdmp.com";
     }
 
 
