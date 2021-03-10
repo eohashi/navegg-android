@@ -1,6 +1,5 @@
 package navegg.bean;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -22,8 +21,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -127,11 +124,13 @@ public class User {
         this.userId = userId;
     }
 
+    //------------------------------------------------
     public String getUserId() {
         if(this.userId==null)
             return "0";
         return this.userId;
     }
+    //-------------------------------------------------
 
     public int getAccountId() {
         return this.accountId;
@@ -176,102 +175,26 @@ public class User {
                 .build();
     }
 
-    /* Track/PageView */
-    public List<PageView> getListMobileAndTrack() {
-
-        return this.trackPageViewList;
-    }
-
-    public void makeAPageView(String activity){
-
-        PageView pageView = new PageView();
-        pageView.setActivity(activity);
-        pageView.setDateTime(utils.getCurrentDateTime());
-        pageView.setTitlePage(String.valueOf(((Activity) this.context).getTitle()));
-        pageView.setCallPage("");
-
-        this.trackPageViewList.add(pageView);
-
-        // Sorting
-        Collections.sort(this.trackPageViewList, new Comparator<PageView>() {
-            @Override
-            public int compare(PageView o1, PageView o2) {
-                Long obj1 = o1.getDateTime();
-                Long obj2 = o2.getDateTime();
-                return obj1.compareTo(obj2);
-            }
-        });
-
-        Gson gson = new Gson();
-        String json = gson.toJson(this.trackPageViewList);
-        this.shaPref.edit().putString("listAppPageView", json).commit();
-    }
-
-    public void cleanPageViewList() {
-        this.shaPref.edit().remove("listAppPageView").apply();
-        this.trackPageViewList.clear();
-    }
-
-    public List<PageView> getTrackPageViewList() {
-        return this.trackPageViewList;
-    }
-
-
-    /* Custom */
-
-    public void setCustom(int id_custom) {
-        this.customList.add(id_custom);
-
-        setPermanentCustom(id_custom);
-
-
-        String json  = new Gson().toJson(this.customList);
-        this.shaPref.edit().putString("customList"+this.accountId, json).commit();
-    }
-
-    private void setPermanentCustom(int id_custom) {
-
-        if(!listCustomPermanent.contains(id_custom)) {
-            listCustomPermanent.add(id_custom);
-            String json = new Gson().toJson(this.listCustomPermanent);
-            this.shaPref.edit().putString("customListAux"+this.accountId, json).commit();
-        }
-
-    }
-
-    public List<Integer> getCustomList() {
-        return this.customList;
-    }
-
-    public void removeCustomId(int id_custom){
-        this.customList.remove(Integer.valueOf(id_custom));
-        if(this.customList.size() > 0) {
-            String json  = new Gson().toJson(this.customList);
-            this.shaPref.edit().putString("customList"+this.accountId, json).commit();
-        }else
-            this.shaPref.edit().remove("customList"+this.accountId).commit();
-
-    }
-
     /* OnBoarding */
+    //-----------------------------------------------------
     public OnBoarding getOnBoarding() {
         return this.onBoarding;
     }
+    //-----------------------------------------------------
 
+    //-----------------------------------------------------
     public boolean setOnBoarding(String key, String value) {
 
         return this.onBoarding.addInfo(key, value);
     }
+    //-----------------------------------------------------
 
 
-    /* Activity Name */
-    public String getLastActivityName(){
-        return this.shaPref.getString("lastActivityName","");
-    }
-
+    //---------------------------------------------------------
     public void setLastActivityName(String activityName){
         this.shaPref.edit().putString("lastActivityName",activityName).apply();
     }
+    //---------------------------------------------------------
 
 
     /* Segments */
@@ -287,6 +210,7 @@ public class User {
 
     }
 
+    //----------------------------------------------------------------------
     public String  getSegments(String segment){
         String idSegment = "";
         try {
@@ -333,6 +257,7 @@ public class User {
 
         return idSegment;
     }
+    //---------------------------------------------------------------------------
 
     private void joinCustomSegments() {
         try {

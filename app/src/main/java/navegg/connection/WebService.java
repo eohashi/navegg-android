@@ -1,10 +1,7 @@
 package navegg.connection;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.provider.Settings;
 import android.util.Base64;
-import android.util.Log;
 
 import com.google.gson.GsonBuilder;
 
@@ -12,11 +9,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -26,7 +20,6 @@ import navegg.BuildConfig;
 import navegg.base.ServerAPI;
 import navegg.bean.OnBoarding;
 import navegg.bean.Package;
-import navegg.bean.PageView;
 import navegg.bean.User;
 import navegg.main.Utils;
 import okhttp3.MediaType;
@@ -146,39 +139,8 @@ public class WebService {
 
     }
 
-    // envio os dados do track de custom para o WS
-    public void sendCustomList(final User user, final List<Integer> listCustom) {
-        if(user.getUserId().equals("0"))return;
-        if (utils.verifyConnectionWifi()) {
-            Call<Void> call1;
-            ServerAPI apiService = WebService.getApiService(
-                    "request",
-                    ProtoConverterFactory.create()
-            ).create(ServerAPI.class);
-            for (final int id_custom : listCustom) {
-                call1 = apiService.sendCustomId(
-                        user.getAccountId(),
-                        id_custom,
-                        user.getUserId()
-                );
-                call1.enqueue(new Callback<Void>() {
 
-                    @Override
-                    public void onResponse(Call<Void> call, Response<Void> response) {
-                        user.removeCustomId(id_custom);
-                    }
-
-                    @Override
-                    public void onFailure(Call<Void> call, Throwable t) {
-                        //t.printStackTrace();
-                        call.cancel();
-                    }
-                });
-            }
-        }
-    }
-
-
+    //-----------------------------------------------------
     // se caso user for null envio as info para WS
     public void createUserId(final User user) {
         String userId = user.getUserId();
@@ -225,45 +187,7 @@ public class WebService {
 
         }
     }
-
-
-    // envio os dados do track para o WS
-    public void sendDataTrack(final User user, List<PageView> pageView) {
-        if(user.getUserId().equals("0")) return;
-        Package.Track trackSerialized = utils.setDataTrack(user, utils.setListDataPageView(pageView));
-
-        if (utils.verifyConnectionWifi()) {
-
-            RequestBody body =
-                    RequestBody.create(
-                            MediaType.parse("text/track"),
-                            Base64.encodeToString(
-                                    trackSerialized.toByteArray(),
-                                    Base64.NO_WRAP
-                            )
-                    );
-            ServerAPI apiService = WebService.getApiService(
-                    "request",
-                    ProtoConverterFactory.create()
-            ).create(ServerAPI.class);
-            Call<Void> call1 = apiService.sendDataTrack(body);
-
-
-            call1.enqueue(new Callback<Void>() {
-
-                @Override
-                public void onResponse(Call<Void> call, Response<Void> response) {
-                    user.cleanPageViewList();
-                }
-
-                @Override
-                public void onFailure(Call<Void> call, Throwable t) {
-                    //t.printStackTrace();
-                    call.cancel();
-                }
-            });
-        }
-    }
+    //-------------------------------------------------------------------
 
     // retornando os segmentos do WS
     public void getSegments(final User user) {
@@ -308,6 +232,7 @@ public class WebService {
     }
 
 
+    //--------------------------------------------------------------------
     // Onboarding
     public void sendOnBoarding(final User user, final OnBoarding onBoarding) {
         if(user.getUserId().equals("0")) return;
@@ -357,6 +282,7 @@ public class WebService {
             });
         }
     }
+    //-------------------------------------------------------------------------
 
 
 }

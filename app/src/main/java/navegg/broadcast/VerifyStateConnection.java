@@ -48,15 +48,6 @@ public class VerifyStateConnection extends BroadcastReceiver {
                 if(user.getUserId().equals("0"))
                     webService.createUserId(user);
 
-                //Send Track
-                if (user.getTrackPageViewList() != null)
-                    webService.sendDataTrack(user, user.getTrackPageViewList());
-
-                //Send Custom
-                if (user.getCustomList() != null) {
-                    webService.sendCustomList(user, user.getCustomList());
-                }
-
                 // Send Onboarding
                 if (user.getOnBoarding().hasToSendOnBoarding()) {
                     webService.sendOnBoarding(user , user.getOnBoarding());

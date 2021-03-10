@@ -171,9 +171,6 @@ public class Utils {
             return "IMEI without permission";
 
         } else {
-            TelephonyManager mTelephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-            String IMEI = mTelephonyManager.getDeviceId();
-
             return "";
         }
     }
